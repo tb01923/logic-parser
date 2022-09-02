@@ -1,0 +1,37 @@
+{
+    const path= require('path');
+    const applicationRoot = path.resolve('.') ;
+    const astSourcePath = applicationRoot + '/parser/ast.js' ;
+    const { join, flatten } = require(astSourcePath)
+}
+
+OrOperation
+    = lhs:AndOperation bits:OrBit* { return join(lhs, bits) }
+
+OrBit
+    =  Space op:Or Space rhs:AndOperation { return {op, rhs} }
+
+AndOperation
+    = lhs:OrOperationOrVariable  bits:AndBit* { return join(lhs, bits) }
+
+AndBit
+    = Space op:And Space rhs:OrOperationOrVariable { return {op, rhs} }
+
+OrOperationOrVariable
+    = "(" Space or:OrOperation Space ")" { return or; }
+    / Variable
+
+And
+    = "and"
+
+Or
+    = "or"
+
+Variable
+    = v:Character  { return {variable: v} }
+
+Character
+  = ([A-Z]/[a-z])
+
+Space "whitespace"
+  = [ \t\n\r]*
