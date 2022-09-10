@@ -6,10 +6,15 @@ const toParser = pegGrammar => peg.generate(pegGrammar)
 
 
 const getParser = () => {
-    const pegGrammar = readUtf8File('./parser/grammar.peg')
+    const pegGrammar = readUtf8File('./parser/1_0/grammar.peg')
     return toParser(pegGrammar)
 }
 
+const parser = getParser()
+
+const parse = line => parser.parse(line)
+
+
 module.exports = Object.freeze({
-    getParser
+    parse
 })

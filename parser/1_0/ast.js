@@ -18,7 +18,10 @@ const lastNode = node => {
 const joiner = (agg, next) => {
 
     const last = lastNode(agg)
-    if (last.rhs) {
+    if (!agg.lhs) {
+        // if the agg is missing the LHS then the agg hasn't been initialized yet
+        agg.lhs = next
+    } else if (last.rhs) {
         // if there is an rhs we need to push it down a layer
         const parentRhs = last.rhs
         last.rhs = {}
@@ -37,7 +40,7 @@ const joiner = (agg, next) => {
 
 }
 const join = (x, xs) => {
-    return xs.reduce(joiner, {lhs: x})
+    return [x].concat(xs).reduce(joiner, {})
 }
 
 module.exports = Object.freeze({

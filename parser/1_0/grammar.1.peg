@@ -1,7 +1,7 @@
 {
     const path= require('path');
     const applicationRoot = path.resolve('.') ;
-    const astSourcePath = applicationRoot + '/parser/ast.js' ;
+    const astSourcePath = applicationRoot + '/parser/1_0/ast.js' ;
     const { join, flatten } = require(astSourcePath)
 }
 
