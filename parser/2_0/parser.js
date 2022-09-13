@@ -3,7 +3,7 @@
 */
 
 const lexer = require('./lexer.js')
-    , {Not, And, Or, Variable} = require("./ast.js")
+    , {Not, And, Or, Variable} = require("../../ast/ast.js")
 
 
 const toAST = (tokens) => {
@@ -12,7 +12,7 @@ const toAST = (tokens) => {
     const eat = p => (tokens) => {
       const t = tokens.shift()
       if( !p( t ) ) {
-          throw "eat wrong tuype"
+          throw new Error("eat wrong type")
       }
     }
     const eatAnd = eat( lexer.isAnd )
@@ -21,23 +21,6 @@ const toAST = (tokens) => {
     const eatVariable = eat( lexer.isVariable )
     const eatLParen = eat( lexer.isLParen )
     const eatRParen = eat( lexer.isRParen )
-
-
-    // const getExpression = tokens => {
-    //     const termOrExpression = getTermOrExpression( tokens )
-    //     const currentToken = peek( tokens )
-    //
-    //     if ( lexer.isAnd( currentToken ) ) {
-    //         eatAnd( tokens )
-    //         return And( termOrExpression, getExpression( tokens ) )
-    //     }
-    //     else if ( lexer.isOr( currentToken ) ) {
-    //         eatOr( tokens )
-    //         return Or( termOrExpression, getExpression( tokens ) )
-    //     }
-    //
-    //     return termOrExpression
-    // }
 
     const getExpression = tokens => {
         const termOrExpression = getOrOperation( tokens )
@@ -51,7 +34,9 @@ const toAST = (tokens) => {
 
         if ( lexer.isOr( currentToken ) ) {
             eatOr( tokens )
-            return Or( termOrExpression, getOrOperation( tokens ) )
+            const lhs = termOrExpression
+            const rhs = getOrOperation( tokens )
+            return Or.from( lhs, rhs )
         }
 
         return termOrExpression
@@ -63,7 +48,9 @@ const toAST = (tokens) => {
 
         if ( lexer.isAnd( currentToken ) ) {
             eatAnd( tokens )
-            return And( termOrExpression, getAndOperation( tokens ) )
+            const lhs = termOrExpression
+            const rhs = getAndOperation( tokens )
+            return And.from( lhs, rhs )
         }
 
 
@@ -75,12 +62,13 @@ const toAST = (tokens) => {
 
         if ( lexer.isNot( currentToken ) ) {
             eatNot( tokens )
-            const term = getTerm( tokens )
-            return Not( term );
+            const term = getTermOrExpression( tokens )
+            return Not.from( term );
         }
         else if ( lexer.isLParen( currentToken ) ) {
             eatLParen( tokens )
             const expression = getExpression( tokens )
+            expression.explicitParens = true
             eatRParen( tokens )
             return expression
         }
@@ -95,7 +83,8 @@ const toAST = (tokens) => {
 
         if ( lexer.isVariable( currentToken ) ) {
             eatVariable( tokens )
-            return Variable( currentToken.value() )
+            const name = currentToken.value
+            return Variable.from( name )
         }
     }
 
@@ -105,6 +94,7 @@ const toAST = (tokens) => {
 const parse = line => {
     const tokens = lexer.lexer( line )
     const ast = toAST( tokens )
+    ast.setDeBruinjIndex()
     return ast
 }
 

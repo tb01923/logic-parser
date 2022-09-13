@@ -1,16 +1,11 @@
-const getInstance = (self, constructor) =>
-    (self instanceof constructor) ?
-        self :
-        Object.create(constructor.prototype) ;
 
-const Token = function(type, value){
-    const self = getInstance(this, Token)
-    self.type = () => type
-    self.value = () => value
-    self.toString = function() {
-        return `Token(${type}, ${value})`
+class Token {
+    constructor (type, value) {
+        this.type = type
+        this.value = value
     }
-    return Object.freeze(self)
+
+    static from = (type, value) => new Token(type, value)
 }
 
 const NOT = "NOT"
@@ -20,7 +15,7 @@ const VARIABLE = "VARIABLE"
 const LPAREN= "("
 const RPAREN = ")"
 
-const is = type => t => t && (t.type() == type)
+const is = type => t => t && (t.type== type)
 const isVariable = is(VARIABLE)
 const isAnd = is(AND)
 const isOr  = is(OR)
@@ -28,41 +23,41 @@ const isNot = is(NOT)
 const isLParen = is(LPAREN)
 const isRParen = is(RPAREN)
 
-const lexer = (line) => {
+const lexer = ( line ) => {
 
     const singleChar = /[a-zA-Z]/
     const whiteSpace = /\s+/
 
     const toToken = token => {
-        if ( whiteSpace.test(token) ) {
+        if ( whiteSpace.test( token ) ) {
             return undefined
         }
-        else if( token == "~" ) {
-            return Token( NOT )
+        else if( token === "~" || token === "not") {
+            return Token.from( NOT )
         }
-        else if ( token == "and" ) {
-            return Token( AND )
+        else if ( token === "and" ) {
+            return Token.from( AND )
         }
-        else if ( token == "or" ) {
-            return Token( OR )
+        else if ( token === "or" ) {
+            return Token.from( OR )
         }
         else if ( token === "(" ) {
-            return Token( LPAREN )
+            return Token.from( LPAREN )
         }
         else if ( token === ")" ) {
-            return Token( RPAREN )
+            return Token.from( RPAREN )
         }
         else if ( singleChar.test(token) ){
-            return Token( VARIABLE, token )
+            return Token.from( VARIABLE, token )
         }
     }
 
     return line
-        .split(/([\s()])/g)             // split on " " | "(" or ")"
-        .filter(t => t !== " ")         // remove spaces
-        .filter(t => t !== "")          // remove empty strings
-        .map(toToken)                   //=> Token
-        .filter(t => t !== undefined)
+        .split( /([\s()])/g )             // split on " " | "(" or ")"
+        .filter( t => t !== " " )         // remove spaces
+        .filter( t => t !== "" )          // remove empty strings
+        .map( toToken )                   //=> Token
+        .filter( t => t !== undefined )
 }
 
 module.exports = Object.freeze({
