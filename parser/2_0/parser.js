@@ -3,7 +3,7 @@
 */
 
 const lexer = require('./lexer.js')
-    , {Not, And, Or, Variable} = require("../../ast/ast.js")
+    , {Not, And, Or, Variable, Implies} = require("../../model/ast/ast.js")
 
 
 const toAST = (tokens) => {
@@ -21,9 +21,24 @@ const toAST = (tokens) => {
     const eatVariable = eat( lexer.isVariable )
     const eatLParen = eat( lexer.isLParen )
     const eatRParen = eat( lexer.isRParen )
+    const eatImplies = eat( lexer.isImplies )
 
     const getExpression = tokens => {
         const termOrExpression = getOrOperation( tokens )
+
+        return termOrExpression
+    }
+
+    const getImplies = tokens => {
+        const termOrExpression = getOrOperation( tokens )
+        const currentToken = peek( tokens )
+
+        if ( lexer.isImplies( currentToken ) ) {
+            eatImplies( tokens )
+            const lhs = termOrExpression
+            const rhs = getImplies( tokens )
+            return Implies.from( lhs, rhs )
+        }
 
         return termOrExpression
     }

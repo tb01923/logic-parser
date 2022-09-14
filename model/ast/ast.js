@@ -4,6 +4,15 @@ const getNextDebuinjIndex = (knownVariables) =>
         .map(k => knownVariables[k])
         .reduce((max, current) => ((current > max) ? current : max), -1) + 1
 
+/*
+    Propositional =
+        And: (Propositional, Propositional)
+        | Or: (Propositional, Propositional)
+        | Implies: (Propositional, Propositional)
+        | Not: (Propositional)
+        | Variable: (char)
+ */
+
 class Propositional {
     constructor() { }
 
@@ -15,9 +24,10 @@ class Propositional {
 }
 
 class UnaryOperation extends Propositional {
-    constructor(term) {
+    constructor(term, explicitParens = false) {
         super()
         this.term = term
+        this.explicitParens = explicitParens
     }
 
     setDeBruinjIndex = function(knownVariables={}) { this.term.setDeBruinjIndex( knownVariables ) }
@@ -47,8 +57,12 @@ class Or extends BinaryOperation {
     static from = (lhs, rhs, explicitParens=false) => new Or(lhs, rhs, explicitParens)
 }
 
+class Implies extends BinaryOperation {
+    static from = (lhs, rhs, explicitParens=false) => new Implies(lhs, rhs, explicitParens)
+}
+
 class Not extends UnaryOperation {
-    static from = term => new Not(term)
+    static from = (term, explicitParens=false) => new Not(term, explicitParens)
 }
 
 class Variable extends Propositional {
@@ -75,6 +89,6 @@ module.exports = Object.freeze({
     And,
     Or,
     Not,
-    Variable
+    Variable,
+    Implies
 })
-//C or A or (not(A) and B)

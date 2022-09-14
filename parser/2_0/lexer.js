@@ -11,6 +11,7 @@ class Token {
 const NOT = "NOT"
 const AND = "AND"
 const OR = "OR"
+const IMPL = "->"
 const VARIABLE = "VARIABLE"
 const LPAREN= "("
 const RPAREN = ")"
@@ -22,6 +23,7 @@ const isOr  = is(OR)
 const isNot = is(NOT)
 const isLParen = is(LPAREN)
 const isRParen = is(RPAREN)
+const isImplies = is(IMPL)
 
 const lexer = ( line ) => {
 
@@ -40,6 +42,9 @@ const lexer = ( line ) => {
         }
         else if ( token === "or" ) {
             return Token.from( OR )
+        }
+        else if ( token === "->" ) {
+            return Token.from( IMPL )
         }
         else if ( token === "(" ) {
             return Token.from( LPAREN )
@@ -67,5 +72,6 @@ module.exports = Object.freeze({
     isOr,
     isNot,
     isLParen,
-    isRParen
+    isRParen,
+    isImplies
 })
