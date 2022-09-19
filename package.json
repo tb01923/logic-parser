@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pegjs": "^0.10.0"
+    "16": "0.0.2",
+    "pegjs": "^0.10.0",
+    "terminal-kit": "^2.11.5"
   }
 }

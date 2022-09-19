@@ -109,7 +109,6 @@ const toAST = (tokens) => {
 const parse = line => {
     const tokens = lexer.lexer( line )
     const ast = toAST( tokens )
-    ast.setDeBruinjIndex()
     return ast
 }
 

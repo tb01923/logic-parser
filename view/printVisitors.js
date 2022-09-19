@@ -26,17 +26,24 @@ const implicitDebruinj = new RecursiveVisitor({
     "Variable": (v, node) => `${node.debruinjIndex}`,
 })
 
-const printExpl = (op, v, node) => {
+const printBinaryExpl = (op, v, node) => {
     if (node.explicitParens) {
         return `(${node.lhs.accept(v)} ${op} ${node.rhs.accept(v)})`
     }
     return `${node.lhs.accept(v)} ${op} ${node.rhs.accept(v)}`
 }
+
+const printUnaryExpl = (op, v, node) => {
+    if (node.explicitParens) {
+        return `${op}(${node.term.accept(v)})`
+    }
+    return `${op} ${node.term.accept(v)}`
+}
 const explicitStatement = new RecursiveVisitor({
-    "And": (v, node) => printExpl('and', v, node),
-    "Or": (v, node) => printExpl('or', v, node),
-    "Implies": (v, node) => printExpl('->', v, node),
-    "Not": (v, node) => `not(${node.term.accept(v)})`,
+    "And": (v, node) => printBinaryExpl('and', v, node),
+    "Or": (v, node) => printBinaryExpl('or', v, node),
+    "Implies": (v, node) => printBinaryExpl('->', v, node),
+    "Not": (v, node) => printUnaryExpl("not", v, node),
     "Variable": (v, node) => `${node.name}`,
 })
 

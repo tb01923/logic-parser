@@ -1,7 +1,7 @@
 const { parse: parse1_0 } = require("./parser/1_0/parser")
 const { parse: parse2_0 } = require("./parser/2_0/parser")
 const readline = require('readline');
-const printVisitors = require("./controller/commands/printVisitors")
+const printVisitors = require("./view/printVisitors")
 
 const parse = parse2_0
 
