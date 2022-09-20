@@ -23,14 +23,14 @@ class Controller {
 
     recommend () {
         const matches = identifyLaws(this.expression)
-        const restatedMatches = restateInNewAlphabet(matches, this.expression.knownDebruinjIndexes)
+        const restatedMatches = restateInNewAlphabet(matches)
         this.viewModel.matches = restatedMatches
         this.view.setViewModel(this.viewModel)
     }
 
     parseInput(input){
         this.expression = parse(input)
-        this.expression.setDeBruinjIndex()
+        //this.expression.setDeBruinjIndex()
         this.viewModel.originalExpression = this.expression
     }
 
@@ -48,7 +48,7 @@ class Controller {
 
         if (isReplaced) {
             // if we replace any bit, we should reindex the debruinj
-            this.expression.setDeBruinjIndex()
+            //this.expression.setDeBruinjIndex()
             // set the viewModel
             this.viewModel.originalExpression = this.expression
             this.viewModel.matches = []

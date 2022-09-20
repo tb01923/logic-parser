@@ -18,12 +18,12 @@ const implicitStatement = new RecursiveVisitor({
     "Variable": (v, node) => `${node.name}`,
 })
 
-const implicitDebruinj = new RecursiveVisitor({
+const implicitDebruinj = (debruinjIndexes) => new RecursiveVisitor({
     "And": (v, node) => printImpl('and', v, node),
     "Or": (v, node) => printImpl('or', v, node),
     "Implies": (v, node) => printImpl('->', v, node),
     "Not": (v, node) => `not(${node.term.accept(v)})`,
-    "Variable": (v, node) => `${node.debruinjIndex}`,
+    "Variable": (v, node) => `${debruinjIndexes[node.name]}`,
 })
 
 const printBinaryExpl = (op, v, node) => {

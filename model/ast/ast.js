@@ -1,11 +1,19 @@
 const { createHash, randomUUID } = require('crypto');
 
+//from: https://www.geeksforgeeks.org/how-to-invert-key-value-in-javascript-object/#:~:text=invert()%20method%20of%20%E2%80%9Cunderscore,values%20and%20values%20as%20keys.
+const invert = object => {
+    var retobj = {};
+    for(var key in object){
+        retobj[object[key]] = key;
+    }
+    return retobj;
+}
+
 const getNextDebuinjIndex = (knownVariables) =>
     Object
         .keys(knownVariables)
         .map(k => knownVariables[k])
         .reduce((max, current) => ((current > max) ? current : max), -1) + 1
-
 
 const sha256 = string => createHash('sha256').update(string).digest('hex');
 
@@ -20,18 +28,15 @@ const sha256 = string => createHash('sha256').update(string).digest('hex');
 class Propositional {
     constructor() {
         this.id = randomUUID()
-        this.knownDebruinjIndexes = {}
     }
 
-    setDeBruinjIndex(knownVariables={}) {
-        this.knownDebruinjIndexes = knownVariables
-    }
+    getDeBruinjIndex(knownVariables={}) { }
 
     accept(visitor) {
         return visitor.visit(this)
     }
 
-    fromNewAlphabet(alphabet) {}
+    fromNewAlphabet(oldAlpha, newAlpha) {}
     clone() {}
     from() {}
     replace(id, expression) {}
@@ -44,9 +49,8 @@ class UnaryOperation extends Propositional {
         this.explicitParens = explicitParens
     }
 
-    setDeBruinjIndex(knownVariables={}) {
-        this.term.setDeBruinjIndex( knownVariables )
-        super.setDeBruinjIndex( knownVariables )
+    getDeBruinjIndex(knownVariables={}) {
+        return this.term.getDeBruinjIndex( knownVariables )
     }
 
     replace(id, expression) {
@@ -58,9 +62,9 @@ class UnaryOperation extends Propositional {
         }
     }
 
-    fromNewAlphabet(alphabet) {
+    fromNewAlphabet(oldAlpha, newAlpha) {
         return this.from(
-            this.term.fromNewAlphabet(alphabet),
+            this.term.fromNewAlphabet(oldAlpha, newAlpha),
             this.explicitParens
         )
     }
@@ -81,10 +85,10 @@ class BinaryOperation extends Propositional {
         this.explicitParens = explicitParens
     }
 
-    setDeBruinjIndex(knownVariables={}) {
-        this.lhs.setDeBruinjIndex( knownVariables )
-        this.rhs.setDeBruinjIndex( knownVariables )
-        super.setDeBruinjIndex( knownVariables )
+    getDeBruinjIndex(knownVariables={}) {
+        knownVariables = this.lhs.getDeBruinjIndex( knownVariables )
+        knownVariables = this.rhs.getDeBruinjIndex( knownVariables )
+        return knownVariables
     }
 
     replace(id, expression) {
@@ -103,10 +107,10 @@ class BinaryOperation extends Propositional {
         }
     }
 
-    fromNewAlphabet(alphabet) {
+    fromNewAlphabet(oldAlpha, newAlpha) {
         return this.from(
-            this.lhs.fromNewAlphabet(alphabet),
-            this.rhs.fromNewAlphabet(alphabet),
+            this.lhs.fromNewAlphabet(oldAlpha, newAlpha),
+            this.rhs.fromNewAlphabet(oldAlpha, newAlpha),
             this.explicitParens
         )
     }
@@ -145,26 +149,26 @@ class Variable extends Propositional {
     constructor(name, debruinjIndex) {
         super();
         this.name = name
-        this.debruinjIndex = debruinjIndex
     }
 
-    setDeBruinjIndex(knownVariables={}) {
-        if( this.name in knownVariables ) {
-            this.debruinjIndex = knownVariables[this.name]
-        } else {
+    getDeBruinjIndex(knownVariables={}) {
+        const not = b => !b
+        if( not(this.name in knownVariables) ) {
             const nextDebruinj = getNextDebuinjIndex(knownVariables)
             knownVariables[this.name] = nextDebruinj
-            this.debruinjIndex = nextDebruinj
         }
-        super.setDeBruinjIndex(knownVariables)
+        return knownVariables
     }
 
-    static from = (x, debruinjIndex) => new Variable(x, debruinjIndex)
+    static from = (x) => new Variable(x)
     from = Variable.from
 
-    fromNewAlphabet(alphabet) {
-        const translated = alphabet[this.debruinjIndex]
-        const newbie = Variable.from(translated, this.debruinjIndex)
+    fromNewAlphabet(oldAlpha, newAlpha) {
+        const debruinjIndex = oldAlpha[this.name]
+        const newAlphaInverted = invert(newAlpha)
+
+        const translated = newAlphaInverted[debruinjIndex]
+        const newbie = Variable.from(translated)
         return newbie
     }
 
@@ -174,8 +178,7 @@ class Variable extends Propositional {
 
     clone() {
         return this.from(
-            this.name,
-            this.debruinjIndex
+            this.name
         )
     }
 }

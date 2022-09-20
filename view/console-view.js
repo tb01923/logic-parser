@@ -18,7 +18,8 @@ const prompt = {
 }
 
 const getDebRuinjString = expression => {
-    const debruinj = expression.accept(printVisitors.implicitDebruinj)
+    const debruinjIndexes = expression.getDeBruinjIndex({})
+    const debruinj = expression.accept(printVisitors.implicitDebruinj(debruinjIndexes))
     return debruinj
 }
 
@@ -97,11 +98,13 @@ class View {
             this.output(`\tmatched sub-expression id\t${matchedLaw.expression.id}`)
             this.output(`\tmatched sub-expression\t\t${matchedSegment}`)
 
-            //const law = getStatementString(matchedLaw.applicableLaw)
-            const law = matchedLaw.law
-            this.output(`[${count}.]\t${matchedLaw.name}\t\t${law}`)
+            if ( matchedLaw.name.length >=17 ) {
+                this.output(`[${count}.]\t${matchedLaw.name}\t\t${matchedLaw.lawString}`)
+            } else {
+                this.output(`[${count}.]\t${matchedLaw.name}\t\t\t${matchedLaw.lawString}`)
+            }
 
-            const lawInALpha = getStatementString(matchedLaw.applicableLawInPreferredAlphabet)
+            const lawInALpha = getStatementString(matchedLaw.translatedLawInPreferredAlphabet)
             this.output(`\tapplied to sub-expression\t${lawInALpha}`)
 
             count = count + 1
@@ -115,7 +118,7 @@ class View {
         const match = this.viewModel.matches[recommendationIdx]
 
         // make replacement
-        this.controller.replace(match.expression, match.applicableLawInPreferredAlphabet)
+        this.controller.replace(match.expression, match.translatedLawInPreferredAlphabet)
 
         // output new command
         const str = getStatementString(this.viewModel.originalExpression)

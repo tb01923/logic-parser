@@ -3,35 +3,25 @@ const parse = parse2_0
 
 // probably not the right dependency... maybe should duplicate?
 const printVisitors = require("../../view/printVisitors")
-const getDebRuinjString = expression => {
-    const debruinj = expression.accept(printVisitors.implicitDebruinj)
+const getDebRuinjString = (expression, knownDebruinj={}) => {
+    const debruinjIndexes = expression.getDeBruinjIndex(knownDebruinj)
+    const debruinj = expression.accept(printVisitors.implicitDebruinj(debruinjIndexes))
     return debruinj
 }
 
-
-//from: https://www.geeksforgeeks.org/how-to-invert-key-value-in-javascript-object/#:~:text=invert()%20method%20of%20%E2%80%9Cunderscore,values%20and%20values%20as%20keys.
-const invert = object => {
-    var retobj = {};
-    for(var key in object){
-        retobj[object[key]] = key;
-    }
-    return retobj;
-}
-
-
 // applyBiCOnditional is to remove recommendations that icrease complexity
 //  we can remove this once we add the tree length to prune options
-const law = (name, law, applyBiConditionally=true) => {
-    const parts = law.split("<=>")
-    const rhs = parse(parts [1])
+const law = (name, lawString, applyBiConditionally=true) => {
+    const parts = lawString.split("<=>")
     const lhs = parse(parts[0])
+    const rhs = parse(parts[1])
     ///////////////////////////////////////////////////////////////////////////////////////
     // in defining the laws the relative positions need to remain the same on both sides
     //      therefore set on the left, retrieve and pass into the right
     ///////////////////////////////////////////////////////////////////////////////////////
-    lhs.setDeBruinjIndex()
-    rhs.setDeBruinjIndex(lhs.knownDebruinjIndexes)
-    return {name, lhs, rhs, law: law, applyBiConditionally}
+    // lhs.setDeBruinjIndex()
+    // rhs.setDeBruinjIndex(lhs.knownDebruinjIndexes)
+    return {name, lhs, rhs, lawString: lawString, applyBiConditionally}
 }
 
 const laws = [
@@ -57,14 +47,25 @@ const identifyLaws = function (expression, matches = []) {
     const expressionDebruinj = getDebRuinjString(expression)
     for (const law of laws) {
         const lhsDeBruinj = getDebRuinjString(law.lhs)
-        const rhsDeBruinj = getDebRuinjString(law.rhs)
+        const rhsDeBruinj = getDebRuinjString(law.rhs, law.lhs.getDeBruinjIndex())
         if (expressionDebruinj == lhsDeBruinj) {
-            matches.push({name: law.name, expression,
-                applicableLaw: law.rhs, law: law.law})
+            matches.push({
+                name: law.name,
+                expression,
+                matchedLaw: law.lhs,
+                translatedLaw: law.rhs,
+                lawString: law.lawString
+            })
         }
         if(law.applyBiConditionally && expressionDebruinj == rhsDeBruinj) {
-            matches.push({name: law.name, expression,
-                applicableLaw: law.lhs, law: law.law})
+            matches.push({
+                name: law.name,
+                expression,
+                matchedLaw: law.rhs,
+                translatedLaw: law.lhs,
+                lawString:
+                law.lawString
+            })
         }
     }
 
@@ -82,16 +83,19 @@ const identifyLaws = function (expression, matches = []) {
     return matches
 }
 
-const restateInNewAlphabet = function(matches, knownDebruinjIndexes) {
-    const inverted = invert(knownDebruinjIndexes)
+const restateInNewAlphabet = function(matches) {
+
     const results = matches
-        .map(matchedLaw => {
+        .map(law => {
+            const oldAlpha = law.matchedLaw.getDeBruinjIndex({})
+            const newAlpha = law.expression.getDeBruinjIndex({})
+            const translatedLawInPreferredAlphabet = law.translatedLaw.fromNewAlphabet(oldAlpha, newAlpha)
             return {
-                name: matchedLaw.name,
-                law: matchedLaw.law,
-                expression: matchedLaw.expression,
-                applicableLaw: matchedLaw.applicableLaw.clone(),
-                applicableLawInPreferredAlphabet: matchedLaw.applicableLaw.fromNewAlphabet(inverted),
+                name: law.name,
+                lawString: law.lawString,
+                expression: law.expression,
+                matchedLaw: law.matchedLaw.clone(),
+                translatedLawInPreferredAlphabet
             }
         })
     return results
