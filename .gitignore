@@ -1,2 +1,9 @@
 .idea/
 node_modules/
+lib/
+*.ast
+*.d
+*.cmi
+*.cmt
+*.cmj
+*.bs.js
