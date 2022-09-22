@@ -32,8 +32,10 @@ let rec getDebruinjIndices = (indices, node) =>
   | And(_, lhs, rhs) => getNextDebuinjIndexBinOp(indices, lhs, rhs)
   | Or(_, lhs, rhs) => getNextDebuinjIndexBinOp(indices, lhs, rhs)
   | Implies(_, lhs, rhs) => getNextDebuinjIndexBinOp(indices, lhs, rhs)
+  | BiConditional(_, lhs, rhs) => getNextDebuinjIndexBinOp(indices, lhs, rhs)
   | Not(_, term) => getDebruinjIndices(indices, term)
   | Variable(_, name) => getDebruinjIndexValue(indices, name)
+  | Value(_,_) => indices
   }
 and getNextDebuinjIndexBinOp = (indices, lhs, rhs) =>
   indices->getDebruinjIndices(lhs)->getDebruinjIndices(rhs);

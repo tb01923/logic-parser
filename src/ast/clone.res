@@ -3,23 +3,19 @@ open Ast;
 exception KeyNotFoundInAlphabet(string, Belt.HashMap.String.t<int>)
 exception KeyNotFoundInInvertedAlphabet(int, Belt.HashMap.Int.t<string>)
 
-let invertHashMap = hashmap => {
-    let invertedMap = Belt.HashMap.Int.make(~hintSize=10);
-
+let invertHashMap = hashmap =>
     hashmap
         // get an array of keys
         ->Belt.HashMap.String.keysToArray
-        // for each key get the value, and then enter them inverted into the target hashmap
-        // (this could be written as a reduce without the variable declaration, or absorbtion by ignore)
-        ->Belt.Array.map(key =>
-            switch Belt.HashMap.String.get(hashmap, key) {
-            | Some (value) => Belt.HashMap.Int.set(invertedMap, value, key)
-            | None => raise(KeyNotFoundInAlphabet(key, hashmap))
-            })
-        ->ignore
-
-  invertedMap;
-};
+        ->Belt.Array.reduce(
+            Belt.HashMap.Int.make(~hintSize=10),
+            (invertedMap, key) => {
+                switch Belt.HashMap.String.get(hashmap, key) {
+                    | Some (value) => Belt.HashMap.Int.set(invertedMap, value, key)
+                    | None => raise(KeyNotFoundInAlphabet(key, hashmap))
+                 }
+                 invertedMap
+             })
 
 let cloneVariable = (name, equationAlphabet, targetAlphabet) => {
     // invert the hashmap to key by the index, and have value be the variable name
@@ -45,8 +41,10 @@ let clone = (equationAlphabet, targetAlphabet) => {
       | And(_, lhs, rhs) => makeAnd(_clone(lhs), _clone(rhs))
       | Or(_, lhs, rhs  ) => makeOr(_clone(lhs), _clone(rhs))
       | Implies(_, lhs, rhs) => makeImplies(_clone(lhs), _clone(rhs))
+      | BiConditional(_, lhs, rhs) => makeBiConditional(_clone(lhs), _clone(rhs))
       | Not(_, term) => makeNot(_clone(term))
       | Variable(_, name) => cloneVariable(name, equationAlphabet, targetAlphabet)
+      | Value(_, boolean) => makeValue(boolean)
       };
 
     // return recursive function
@@ -68,4 +66,5 @@ let hm = Belt.HashMap.String.make(~hintSize=10)
 Belt.HashMap.String.set(hm, "p", 0)
 Belt.HashMap.String.set(hm, "q", 1)
 
-clone(makeAnd( makeVariable("a"), makeVariable("b")), ~targetAlphabet=hm)
+let ast = makeAnd( makeVariable("a"), makeVariable("b"))
+let ast2 = clone(ast, ~targetAlphabet=hm)
