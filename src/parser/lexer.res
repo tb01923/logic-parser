@@ -16,6 +16,19 @@ type token =
   | Truth
   | Falsity;
 
+let matches = (tokenA, tokenB) => switch (tokenA, tokenB) {
+    | (Or, Or) => true
+    | (And, And) => true
+    | (ThinRightArrow, ThinRightArrow) => true
+    | (FatDoubleArrow, FatDoubleArrow) => true
+    | (Not, Not) => true
+    | (Truth, Truth) => true
+    | (Falsity, Falsity) => true
+    | (Variable(a),Variable(b)) if a === b => true
+    | _ => false
+}
+
+
 exception UnknownWord(string)
 
 let splitIntoWords = Js.String.splitByRe(%re("/([\s\(\)])/g"))
@@ -69,5 +82,3 @@ let getTokens = line => {
         -> Belt.Array.keepMap(isWord)
         -> Belt.Array.reduce([], addWordToTokens)
 };
-
-let myTokens = getTokens("not a and not(b -> a) <=> d")

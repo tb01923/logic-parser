@@ -1,4 +1,9 @@
-const { createHash, randomUUID } = require('crypto');
+//const { createHash, randomUUID } = require('crypto');
+
+const { createHash } = require('crypto');
+
+let i = 0 ;
+const randomUUID = () => ++i
 
 //from: https://www.geeksforgeeks.org/how-to-invert-key-value-in-javascript-object/#:~:text=invert()%20method%20of%20%E2%80%9Cunderscore,values%20and%20values%20as%20keys.
 const invert = object => {
