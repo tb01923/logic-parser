@@ -16,7 +16,7 @@ type token =
   | Truth
   | Falsity;
 
-let equals = (tokenA, tokenB) => switch (tokenA, tokenB) {
+let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (Variable(a), Variable(b)) if a === b => true
     | (Variable(a), Variable(b)) if a !== b => false
     | (Variable(_), _) => false

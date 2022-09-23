@@ -5,7 +5,7 @@ let peek = tokens => Belt.Array.get(tokens, 0)
 let peekNext = tokens => Belt.Array.get(tokens, 1)
 
 let eat = (expectedType, tokens) => switch (expectedType, Js.Array.shift(tokens)) {
-    | (tokenA, Some(tokenB)) if Lexer.equals(tokenA, tokenB) => ()
+    | (tokenA, Some(tokenB)) if Lexer.tokenEquals(tokenA, tokenB) => ()
     | (_, Some(unexpectedToken)) => raise(UnexpectedToken(unexpectedToken))
     | (_, None) => raise(NoTokens)
 }
@@ -60,7 +60,7 @@ and getBinaryOperation = (tokens, operations) => {
     //       and rhs of recursing at this same level
     //      else just return the results of looking 'higher'
     switch (peek(tokens), peek(operations)) {
-        | (Some(token), Some(expectedToken, constructor)) if Lexer.equals(token, expectedToken) => {
+        | (Some(token), Some(expectedToken, constructor)) if Lexer.tokenEquals(token, expectedToken) => {
             eat(expectedToken, tokens)
             let lhs = higherPrecedentExpression
             let rhs = getBinaryOperation(tokens, operations)
