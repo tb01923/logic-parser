@@ -16,16 +16,39 @@ type token =
   | Truth
   | Falsity;
 
-let matches = (tokenA, tokenB) => switch (tokenA, tokenB) {
+let equals = (tokenA, tokenB) => switch (tokenA, tokenB) {
+    | (Variable(a), Variable(b)) if a === b => true
+    | (Variable(a), Variable(b)) if a !== b => false
+    | (Variable(_), _) => false
+    | (_, Variable(_)) => false
     | (Or, Or) => true
+    | (Or, _) => false
+    | (_, Or) => false
     | (And, And) => true
+    | (And, _) => false
+    | (_, And) => false
     | (ThinRightArrow, ThinRightArrow) => true
+    | (ThinRightArrow, _) => false
+    | (_, ThinRightArrow) => false
     | (FatDoubleArrow, FatDoubleArrow) => true
+    | (FatDoubleArrow, _) => false
+    | (_, FatDoubleArrow) => false
     | (Not, Not) => true
+    | (Not, _) => false
+    | (_, Not) => false
     | (Truth, Truth) => true
+    | (Truth, _) => false
+    | (_, Truth) => false
     | (Falsity, Falsity) => true
-    | (Variable(a),Variable(b)) if a === b => true
-    | _ => false
+    | (Falsity, _) => false
+    | (_, Falsity) => false
+    | (LParen, LParen) => true
+    | (LParen, _) => false
+    | (_, LParen) => false
+    | (RParen, RParen) => true
+    // this is covered by all other patterns
+    //| (RParen, _) => false
+    //| (_, RParen) => false
 }
 
 

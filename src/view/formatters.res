@@ -16,5 +16,5 @@ and printUnary = (op, term) => {
   op ++ "(" ++ print(term) ++ ")";
 };
 
-let a = Parser.parse("a and b or e and d");
+let a = Parser.parse("a and (b or e) and d -> c <=> v");
 Js.Console.log(print(a));
