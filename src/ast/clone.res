@@ -38,11 +38,8 @@ let clone = (equationAlphabet, targetAlphabet) => {
     //   to make code more readable
     let rec _clone = (node) =>
       switch (node) {
-      | And(_, lhs, rhs) => makeAnd(_clone(lhs), _clone(rhs))
-      | Or(_, lhs, rhs  ) => makeOr(_clone(lhs), _clone(rhs))
-      | Implies(_, lhs, rhs) => makeImplies(_clone(lhs), _clone(rhs))
-      | BiConditional(_, lhs, rhs) => makeBiConditional(_clone(lhs), _clone(rhs))
-      | Not(_, term) => makeNot(_clone(term))
+      | BinaryOperation(_, operator, lhs, rhs) => makeBinaryOperation(operator, _clone(lhs), _clone(rhs))
+      | Negate(_, term) => makeNegate(_clone(term))
       | Variable(_, name) => cloneVariable(name, equationAlphabet, targetAlphabet)
       | Value(_, boolean) => makeValue(boolean)
       };
@@ -66,5 +63,5 @@ let hm = Belt.HashMap.String.make(~hintSize=10)
 Belt.HashMap.String.set(hm, "p", 0)
 Belt.HashMap.String.set(hm, "q", 1)
 
-let ast = makeAnd( makeVariable("a"), makeVariable("b"))
+let ast = makeConjunction( makeVariable("a"), makeVariable("b"))
 let ast2 = clone(ast, ~targetAlphabet=hm)
