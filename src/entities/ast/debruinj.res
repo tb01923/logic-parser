@@ -35,7 +35,7 @@ let getDebruinjIndices = node => {
             ->getDebruinjIndices(lhs)
             ->getDebruinjIndices(rhs)
     }
-    | Negate(_, term) => getDebruinjIndices(indices, term)
+    | Negation(_, term) => getDebruinjIndices(indices, term)
     | Variable(_, name) => getDebruinjIndexValue(indices, name)
     | Value(_, _) => indices
     }

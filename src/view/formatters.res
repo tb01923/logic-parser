@@ -26,7 +26,7 @@ let implicitString = (variableResolver, context, node) => {
         ->getOperator
         ->printBinary(lhs, rhs)
       }
-      | Negate(_, term) => printUnary("¬", term)
+      | Negation(_, term) => printUnary("¬", term)
       | Variable(_, name) => variableResolver(name, context)
       | Value(_, true) => "⊤"
       | Value(_, false) => "⊥"

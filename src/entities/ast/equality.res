@@ -12,7 +12,7 @@ let equals = (variableEquals) => {
 
     let rec equals = (astA, astB) => switch (astA, astB) {
     | (Value(_, a), Value(_, b)) => a === b
-    | (Negate(_, termA), Negate(_, termB)) => equals(termA, termB)
+    | (Negation(_, termA), Negation(_, termB)) => equals(termA, termB)
     | (Variable(_, a), Variable(_, b)) => variableEquals(a, b)
     | (BinaryOperation(_, opA, lhsA, rhsA), BinaryOperation(_, opB, lhsB, rhsB)) =>
         opEqual(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)

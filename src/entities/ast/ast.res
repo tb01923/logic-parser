@@ -1,4 +1,5 @@
 type uuid = string
+type symbol = string
 
 type binaryOperator =
    | Conjunction
@@ -7,13 +8,13 @@ type binaryOperator =
    | BiConditional
    | Equivalence
 
-type rec propositional =
-  | BinaryOperation(uuid, binaryOperator, propositional, propositional)
-  | Negate(uuid, propositional)
-  | Variable(uuid, string)
+type rec proposition =
+  | BinaryOperation(uuid, binaryOperator, proposition, proposition)
+  | Negation(uuid, proposition)
+  | Variable(uuid, symbol)
   | Value(uuid, bool)
 
-exception NotBinaryOperation(propositional)
+exception NotBinaryOperation(proposition)
 
 let makeConjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Conjunction, lhs, rhs)
 let makeDisjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Disjunction, lhs, rhs)
@@ -27,7 +28,7 @@ let makeBinaryOperation = (operator, lhs, rhs) => switch operator {
     | BiConditional => makeBiConditional(lhs, rhs)
     | Equivalence => makeEquivalence(lhs, rhs)
 }
-let makeNegate = (term) => Negate(Uuid.V4.make(), term)
+let makeNegation = (term) => Negation(Uuid.V4.make(), term)
 let makeVariable = name => Variable(Uuid.V4.make(), name)
 let makeValue = b => Value(Uuid.V4.make(), b)
 let getLhs = op => switch op {

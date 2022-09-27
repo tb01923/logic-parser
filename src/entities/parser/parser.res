@@ -22,7 +22,7 @@ let rec getParensNotOrAtom = tokens => switch peek( tokens ) {
     | Some(Lexer.Not) => {
         eat(Lexer.Not, tokens)
         let subExpression = getParensNotOrAtom(tokens)
-        Ast.makeNegate(subExpression)
+        Ast.makeNegation(subExpression)
     }
     | Some(Lexer.LParen) => {
         eat(Lexer.LParen, tokens)

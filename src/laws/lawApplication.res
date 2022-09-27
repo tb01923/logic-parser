@@ -37,7 +37,7 @@ let rec identifyLaws = statement => {
         -> Belt.Array.concatMany
 
     let subMatches = switch statement {
-    | Negate(_, term) => identifyLaws(term)
+    | Negation(_, term) => identifyLaws(term)
     | BinaryOperation(_,_, lhs, rhs) => Belt.Array.concat(identifyLaws(lhs), identifyLaws(rhs))
     | _ => []
     }

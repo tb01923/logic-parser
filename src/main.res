@@ -31,9 +31,9 @@ let printLawsFor = str => {
     })
 }
 
-//printLawsFor("(T and T)")
+printLawsFor("(T and T)")
 //printLawsFor("not(c and d) and not(d or c)")
-printLawsFor("a and b and a")
+//printLawsFor("a and b and a")
 
 // a and not(a) <=> F
 // c and not(c) <=> F
