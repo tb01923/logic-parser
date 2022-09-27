@@ -12,6 +12,7 @@ type token =
   | Or
   | ThinRightArrow
   | FatDoubleArrow
+  | Equal
   | Variable(string)
   | Truth
   | Falsity;
@@ -46,6 +47,9 @@ let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (LParen, _) => false
     | (_, LParen) => false
     | (RParen, RParen) => true
+    | (RParen, _) => false
+    | (Equal, Equal) => true
+    | (Equal, _) => false
     // this is covered by all other patterns
     //| (RParen, _) => false
     //| (_, RParen) => false
@@ -82,6 +86,8 @@ let addWordToTokens = (tokens, word) => {
         | "⊥" => Falsity
         | "F" => Falsity
         | "0" => Falsity
+        | "=" => Equal
+        | "≡" => Equal
         | name if Js.String.length(name) === 1 => Variable(name)
         | word => raise(UnknownWord(word))
     }

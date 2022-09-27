@@ -1,5 +1,4 @@
-open Ast
-
+open Ast;
 let increment = a => a + 1
 
 let max = (a, b) =>
@@ -20,16 +19,16 @@ let getDebruinjIndices = node => {
     ->Belt.Option.getWithDefault(-1)
     ->increment
 
-  let getDebruinjIndexValue = (indices, name) =>
-    if Belt.HashMap.String.has(indices, name) {
-      indices
-    } else {
-      let nextIndex = getNextDebuinjIndex(indices)
-      Belt.HashMap.String.set(indices, name, nextIndex)
-      indices
+  let id = (_, x) => x
+  let getDebruinjIndexValue = (indices, name) => switch Belt.HashMap.String.has(indices, name) {
+    | true => indices
+    | false =>
+        getNextDebuinjIndex(indices)
+        -> Belt.HashMap.String.set(indices, name, _)
+        -> id(indices)
     }
 
-  let rec getDebruinjIndices = (indices, node) =>
+ let rec getDebruinjIndices = (indices, node) =>
     switch node {
     | BinaryOperation(_, _, lhs, rhs) => {
         indices

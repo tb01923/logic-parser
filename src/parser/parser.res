@@ -11,6 +11,7 @@ let eat = (expectedType, tokens) => switch (expectedType, Js.Array.shift(tokens)
 }
 
 let operatorPrecendence = [
+    (Lexer.Equal, Ast.makeEquivalence),
     (Lexer.FatDoubleArrow, Ast.makeBiConditional),
     (Lexer.ThinRightArrow, Ast.makeConditional),
     (Lexer.Or, Ast.makeDisjunction),

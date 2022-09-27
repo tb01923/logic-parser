@@ -5,6 +5,7 @@ type binaryOperator =
    | Disjunction
    | Conditional
    | BiConditional
+   | Equivalence
 
 type rec propositional =
   | BinaryOperation(uuid, binaryOperator, propositional, propositional)
@@ -18,11 +19,13 @@ let makeConjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Conjunction,
 let makeDisjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Disjunction, lhs, rhs)
 let makeConditional = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Conditional, lhs, rhs)
 let makeBiConditional = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), BiConditional, lhs, rhs)
+let makeEquivalence = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Equivalence, lhs, rhs)
 let makeBinaryOperation = (operator, lhs, rhs) => switch operator {
     | Conjunction => makeConjunction(lhs, rhs)
     | Disjunction => makeDisjunction(lhs, rhs)
     | Conditional => makeConditional(lhs, rhs)
     | BiConditional => makeBiConditional(lhs, rhs)
+    | Equivalence => makeEquivalence(lhs, rhs)
 }
 let makeNegate = (term) => Negate(Uuid.V4.make(), term)
 let makeVariable = name => Variable(Uuid.V4.make(), name)

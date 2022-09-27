@@ -16,6 +16,7 @@ let implicitString = (variableResolver, context, node) => {
         | Disjunction => "∨"
         | Conditional => "->"
         | BiConditional => "<=>"
+        | Equivalence => "≡"
     }
 
     let rec _implicitString = node =>
@@ -41,9 +42,3 @@ let implicitString = (variableResolver, context, node) => {
 
 let printImplicit = node => implicitString(variableNameResolver, None, node)
 let printImplicitDeBruinj = node => implicitString(variableDebruinjResolver, Debruinj.getDebruinjIndices(node), node)
-
-
-
-//let a = Parser.parse("a and (b or e) and d -> c <=> v");
-//Js.Console.log(printImplicitStatement(a));
-//Js.Console.log(printImplicitDeBruinj(a));

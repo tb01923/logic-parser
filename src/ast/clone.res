@@ -1,7 +1,14 @@
 open Ast;
-
 exception KeyNotFoundInAlphabet(string, Belt.HashMap.String.t<int>)
 exception KeyNotFoundInInvertedAlphabet(int, Belt.HashMap.Int.t<string>)
+
+let accumulateInvertedMap = (hashmap, invertedMap, key) => {
+    switch Belt.HashMap.String.get(hashmap, key) {
+    | Some (value) => Belt.HashMap.Int.set(invertedMap, value, key)
+    | None => raise(KeyNotFoundInAlphabet(key, hashmap))
+    }
+    invertedMap
+ }
 
 let invertHashMap = hashmap =>
     hashmap
@@ -9,13 +16,7 @@ let invertHashMap = hashmap =>
         ->Belt.HashMap.String.keysToArray
         ->Belt.Array.reduce(
             Belt.HashMap.Int.make(~hintSize=10),
-            (invertedMap, key) => {
-                switch Belt.HashMap.String.get(hashmap, key) {
-                    | Some (value) => Belt.HashMap.Int.set(invertedMap, value, key)
-                    | None => raise(KeyNotFoundInAlphabet(key, hashmap))
-                 }
-                 invertedMap
-             })
+            accumulateInvertedMap(hashmap))
 
 let cloneVariable = (name, equationAlphabet, targetAlphabet) => {
     // invert the hashmap to key by the index, and have value be the variable name
@@ -58,10 +59,10 @@ let clone = (~targetAlphabet=?, equation) => {
     // invoke
     clone(equationAlphabet, targetAlphabet, equation);
 };
-
-let hm = Belt.HashMap.String.make(~hintSize=10)
-Belt.HashMap.String.set(hm, "p", 0)
-Belt.HashMap.String.set(hm, "q", 1)
-
-let ast = makeConjunction( makeVariable("a"), makeVariable("b"))
-let ast2 = clone(ast, ~targetAlphabet=hm)
+//
+//let hm = Belt.HashMap.String.make(~hintSize=10)
+//Belt.HashMap.String.set(hm, "p", 0)
+//Belt.HashMap.String.set(hm, "q", 1)
+//
+//let ast = makeConjunction( makeVariable("a"), makeVariable("b"))
+//let ast2 = clone(ast, ~targetAlphabet=hm)

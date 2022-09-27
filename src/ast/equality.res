@@ -1,5 +1,6 @@
+open Ast
+
 let equals = (variableEquals) => {
-    open Ast
 
     let opEqual = (opA, opB) => switch (opA, opB) {
     | (Conjunction, Conjunction) => true
@@ -21,7 +22,7 @@ let equals = (variableEquals) => {
     equals
 }
 
-let debruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
+let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
 
     let ctxA = switch aCtxSrc {
     | Some(stmt) =>  Debruinj.getDebruinjIndices(stmt)
@@ -41,7 +42,7 @@ let debruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
     equals(variableIndexEquals, stmtA, stmtB)
 }
 
-let name = (stmtA, stmtB) => {
+let byName = (stmtA, stmtB) => {
     let nameEquals = (a, b) => a === b
     equals(nameEquals, stmtA, stmtB)
 }
