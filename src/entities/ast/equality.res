@@ -1,19 +1,22 @@
 open Ast
+open Debruinj
 
-let equals = (variableEquals) => {
+let opEqual = (opA, opB) => switch (opA, opB) {
+| (Conjunction, Conjunction) => true
+| (Disjunction, Disjunction) => true
+| (Conditional, Conditional) => true
+| (BiConditional, BiConditional) => true
+| (_, _) => false
+}
 
-    let opEqual = (opA, opB) => switch (opA, opB) {
-    | (Conjunction, Conjunction) => true
-    | (Disjunction, Disjunction) => true
-    | (Conditional, Conditional) => true
-    | (BiConditional, BiConditional) => true
-    | (_, _) => false
-    }
+let equals = (symbolEquals) => {
 
     let rec equals = (astA, astB) => switch (astA, astB) {
     | (Value(_, a), Value(_, b)) => a === b
     | (Negation(_, termA), Negation(_, termB)) => equals(termA, termB)
-    | (Variable(_, a), Variable(_, b)) => variableEquals(a, b)
+    | (Variable(_, a), Variable(_, b)) => symbolEquals(a, b)
+    // todo: maybe throw an exception IF symobols are equals, but the propositions are not???
+    | (Abstraction(_, a, _), Abstraction(_, b, _)) => symbolEquals(a, b)
     | (BinaryOperation(_, opA, lhsA, rhsA), BinaryOperation(_, opB, lhsB, rhsB)) =>
         opEqual(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)
     | (_, _) => false
@@ -21,6 +24,18 @@ let equals = (variableEquals) => {
 
     equals
 }
+
+let rec byAbstractionResolution = (astA, astB) =>
+    switch (astA, astB) {
+    | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB))) =>
+    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    | (Abstraction(_, _, BinaryOperation(_, opA, lhsA, rhsA)), BinaryOperation(_, opB, lhsB, rhsB)) =>
+    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    | (Abstraction(_, _, Negation(_, termA)), Negation(_, termB)) => byAbstractionResolution(termA, termB)
+    | (Negation(_, termA), Abstraction(_, _, Negation(_, termB))) => byAbstractionResolution(termA, termB)
+    | (_, _) => false
+    }
+
 
 let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
 
@@ -30,8 +45,8 @@ let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
     }
 
     let ctxB = switch bCtxSrc {
-    | Some(stmt) =>  Debruinj.getDebruinjIndices(stmt)
-    | None =>  Debruinj.getDebruinjIndices(stmtB)
+    | Some(stmt) => getDebruinjIndices(stmt)
+    | None => getDebruinjIndices(stmtB)
     }
 
     let variableIndexEquals = (a,b) => {
@@ -46,3 +61,11 @@ let byName = (stmtA, stmtB) => {
     let nameEquals = (a, b) => a === b
     equals(nameEquals, stmtA, stmtB)
 }
+
+module PropositionCompare= Belt.Id.MakeComparable({
+  type t = proposition
+  let cmp = (a, b) => switch byName(a, b) {
+  | true => 0
+  | false => 1
+  }
+})

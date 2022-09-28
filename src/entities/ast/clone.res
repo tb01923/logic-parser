@@ -40,6 +40,7 @@ let clone = (equationAlphabet, targetAlphabet) => {
     let rec _clone = (node) =>
       switch (node) {
       | BinaryOperation(_, operator, lhs, rhs) => makeBinaryOperation(operator, _clone(lhs), _clone(rhs))
+      | Abstraction(_, symb, prop) => makeAbstraction(symb, _clone(prop))
       | Negation(_, term) => makeNegation(_clone(term))
       | Variable(_, name) => cloneVariable(name, equationAlphabet, targetAlphabet)
       | Value(_, boolean) => makeValue(boolean)

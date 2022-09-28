@@ -31,7 +31,22 @@ let printLawsFor = str => {
     })
 }
 
-printLawsFor("(T and T)")
+
+//let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
+let x = Parser.parse("not(b)")
+
+
+
+let xs = Abstraction.getAbstractions(x)
+Js.Console.log(printImplicit(x))
+Belt.Array.forEach(xs, (x) => {
+    let str = x->printImplicit
+    Js.Console.log(str)
+})
+
+
+
+//printLawsFor("(T and T)")
 //printLawsFor("not(c and d) and not(d or c)")
 //printLawsFor("a and b and a")
 

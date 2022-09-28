@@ -11,10 +11,19 @@ type binaryOperator =
 type rec proposition =
   | BinaryOperation(uuid, binaryOperator, proposition, proposition)
   | Negation(uuid, proposition)
+  | Abstraction(uuid, symbol, proposition)
   | Variable(uuid, symbol)
   | Value(uuid, bool)
 
 exception NotBinaryOperation(proposition)
+
+let getId = node => switch node {
+  | BinaryOperation(uuid, _, _, _) => uuid
+  | Negation(uuid, _) => uuid
+  | Abstraction(uuid, _, _) => uuid
+  | Variable(uuid, _) => uuid
+  | Value(uuid, _) => uuid
+}
 
 let makeConjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Conjunction, lhs, rhs)
 let makeDisjunction = (lhs, rhs) => BinaryOperation(Uuid.V4.make(), Disjunction, lhs, rhs)
@@ -31,6 +40,7 @@ let makeBinaryOperation = (operator, lhs, rhs) => switch operator {
 let makeNegation = (term) => Negation(Uuid.V4.make(), term)
 let makeVariable = name => Variable(Uuid.V4.make(), name)
 let makeValue = b => Value(Uuid.V4.make(), b)
+let makeAbstraction = (symb, prop) => Abstraction(Uuid.V4.make(), symb, prop)
 let getLhs = op => switch op {
    | BinaryOperation(_, _, lhs, _) => lhs
    | _ => raise(NotBinaryOperation(op))

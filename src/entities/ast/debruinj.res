@@ -10,8 +10,8 @@ let max = (a, b) =>
   | (None, None) => Some(-1)
   }
 
-let getDebruinjIndices = node => {
-  let getNextDebuinjIndex = knownVariables =>
+
+let getNextDebuinjIndex = knownVariables =>
     knownVariables
     ->Belt.HashMap.String.keysToArray
     ->Js.Array2.map(key => Belt.HashMap.String.get(knownVariables, key))
@@ -19,14 +19,35 @@ let getDebruinjIndices = node => {
     ->Belt.Option.getWithDefault(-1)
     ->increment
 
-  let id = (_, x) => x
-  let getDebruinjIndexValue = (indices, name) => switch Belt.HashMap.String.has(indices, name) {
+
+let addSymbolToIndices = (indices, name) => {
+    let id = (_, x) => x
+    switch Belt.HashMap.String.has(indices, name) {
     | true => indices
     | false =>
         getNextDebuinjIndex(indices)
         -> Belt.HashMap.String.set(indices, name, _)
         -> id(indices)
     }
+}
+
+let getNextSymbol = (indices) => {
+    let max = (a, b) => switch (a > b) {
+    | true => a
+    | false => b
+    }
+
+    let increment = x => Belt.Float.toInt(x) + 1
+
+    indices
+    -> Belt.HashMap.String.keysToArray
+    -> Belt.Array.reduce("", max)
+    -> Js.String2.charCodeAt(0)
+    -> increment
+    -> Js.String2.fromCharCode
+}
+
+let getDebruinjIndices = node => {
 
  let rec getDebruinjIndices = (indices, node) =>
     switch node {
@@ -36,9 +57,11 @@ let getDebruinjIndices = node => {
             ->getDebruinjIndices(rhs)
     }
     | Negation(_, term) => getDebruinjIndices(indices, term)
-    | Variable(_, name) => getDebruinjIndexValue(indices, name)
+    | Variable(_, name) => addSymbolToIndices(indices, name)
+    | Abstraction(_, symb, _) => addSymbolToIndices(indices, symb)
     | Value(_, _) => indices
     }
 
-  Belt.HashMap.String.make(~hintSize=10)->getDebruinjIndices(node)
+  Belt.HashMap.String.make(~hintSize=10)
+  ->getDebruinjIndices(node)
 }

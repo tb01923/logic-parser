@@ -1,3 +1,4 @@
+open Ast
 exception UnableToResolveVariable(string);
 
 let variableNameResolver = (name, _) => name
@@ -9,8 +10,8 @@ let variableDebruinjResolver = (name, context) => {
     }
 }
 
-let implicitString = (variableResolver, context, node) => {
-    open Ast
+let implicitString = (symbolResolver, context, node) => {
+
     let getOperator = operator => switch operator {
         | Conjunction => "∧"
         | Disjunction => "∨"
@@ -19,7 +20,7 @@ let implicitString = (variableResolver, context, node) => {
         | Equivalence => "≡"
     }
 
-    let rec _implicitString = node =>
+    let rec implicitString = node =>
       switch (node) {
       | BinaryOperation(_, operator, lhs, rhs) => {
         operator
@@ -27,17 +28,22 @@ let implicitString = (variableResolver, context, node) => {
         ->printBinary(lhs, rhs)
       }
       | Negation(_, term) => printUnary("¬", term)
-      | Variable(_, name) => variableResolver(name, context)
+      | Abstraction(_, symb, prop) => printAbstraction(symb, prop)
+      | Variable(_, name) => symbolResolver(name, context)
       | Value(_, true) => "⊤"
       | Value(_, false) => "⊥"
       }
     and printBinary = (op, lhs, rhs) => {
-      "(" ++ _implicitString(lhs) ++ " " ++ op ++ " " ++ _implicitString(rhs) ++ ")";
+      "(" ++ implicitString(lhs) ++ " " ++ op ++ " " ++ implicitString(rhs) ++ ")";
     }
     and printUnary = (op, term) => {
-      op ++ "(" ++ _implicitString(term) ++ ")";
+      op ++ "(" ++ implicitString(term) ++ ")";
+    }
+    and printAbstraction = (symb, prop) => {
+     // this isn't the right way to express the substitution, but it works okay for now
+     "[" ++ symbolResolver(symb, context) ++ "/" ++ implicitString(prop) ++ "]"
     };
-    _implicitString(node)
+    implicitString(node)
 }
 
 let printImplicit = node => implicitString(variableNameResolver, None, node)
