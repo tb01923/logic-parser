@@ -33,15 +33,15 @@ let printLawsFor = str => {
 
 
 //let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
-let x = Parser.parse("not(b)")
-
+let x = Parser.parse("a and not(b)")
+let y = Parser.parse("a and b")
 
 
 let xs = Abstraction.getAbstractions(x)
-Js.Console.log(printImplicit(x))
 Belt.Array.forEach(xs, (x) => {
-    let str = x->printImplicit
-    Js.Console.log(str)
+    Js.Console.log(x->printImplicit)
+    Js.Console.log(x->printImplicitDeBruinj)
+    Js.Console.log(Equality.byDebruinj(x, y))
 })
 
 

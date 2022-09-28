@@ -15,27 +15,19 @@ let equals = (symbolEquals) => {
     | (Value(_, a), Value(_, b)) => a === b
     | (Negation(_, termA), Negation(_, termB)) => equals(termA, termB)
     | (Variable(_, a), Variable(_, b)) => symbolEquals(a, b)
-    // todo: maybe throw an exception IF symobols are equals, but the propositions are not???
-    | (Abstraction(_, a, _), Abstraction(_, b, _)) => symbolEquals(a, b)
     | (BinaryOperation(_, opA, lhsA, rhsA), BinaryOperation(_, opB, lhsB, rhsB)) =>
         opEqual(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)
+    // todo: maybe throw an exception IF symbols are equals, but the propositions are not???
+    | (Abstraction(_, a, _), Abstraction(_, b, _)) => symbolEquals(a, b)
+    // todo: this seems like a hack, use variable to resolve debruinj index of abstraction
+    | (_, Abstraction(_, symbol, _)) => equals(astA, makeVariable(symbol))
+    | (Abstraction(_, symbol, _), _) => equals(makeVariable(symbol), astB)
+    // if we are not handling it, it is definitely not a match
     | (_, _) => false
     }
 
     equals
 }
-
-let rec byAbstractionResolution = (astA, astB) =>
-    switch (astA, astB) {
-    | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB))) =>
-    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
-    | (Abstraction(_, _, BinaryOperation(_, opA, lhsA, rhsA)), BinaryOperation(_, opB, lhsB, rhsB)) =>
-    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
-    | (Abstraction(_, _, Negation(_, termA)), Negation(_, termB)) => byAbstractionResolution(termA, termB)
-    | (Negation(_, termA), Abstraction(_, _, Negation(_, termB))) => byAbstractionResolution(termA, termB)
-    | (_, _) => false
-    }
-
 
 let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
 
@@ -61,6 +53,17 @@ let byName = (stmtA, stmtB) => {
     let nameEquals = (a, b) => a === b
     equals(nameEquals, stmtA, stmtB)
 }
+
+let rec byAbstractionResolution = (astA, astB) =>
+    switch (astA, astB) {
+    | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB))) =>
+    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    | (Abstraction(_, _, BinaryOperation(_, opA, lhsA, rhsA)), BinaryOperation(_, opB, lhsB, rhsB)) =>
+    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    | (Abstraction(_, _, Negation(_, termA)), Negation(_, termB)) => byAbstractionResolution(termA, termB)
+    | (Negation(_, termA), Abstraction(_, _, Negation(_, termB))) => byAbstractionResolution(termA, termB)
+    | (_, _) => byName(astA, astB)
+    }
 
 module PropositionCompare= Belt.Id.MakeComparable({
   type t = proposition

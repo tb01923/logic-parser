@@ -53,12 +53,15 @@ let getDebruinjIndices = node => {
     switch node {
     | BinaryOperation(_, _, lhs, rhs) => {
         indices
-            ->getDebruinjIndices(lhs)
-            ->getDebruinjIndices(rhs)
+        ->getDebruinjIndices(lhs)
+        ->getDebruinjIndices(rhs)
     }
     | Negation(_, term) => getDebruinjIndices(indices, term)
     | Variable(_, name) => addSymbolToIndices(indices, name)
-    | Abstraction(_, symb, _) => addSymbolToIndices(indices, symb)
+    | Abstraction(_, symb, prop) =>
+        indices
+        ->addSymbolToIndices(symb)
+        ->getDebruinjIndices(prop)
     | Value(_, _) => indices
     }
 

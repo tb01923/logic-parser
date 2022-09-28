@@ -49,36 +49,29 @@ let abstractOperation = (knownSymbols, operation) => {
     makeAbstraction(nextSymbol, operation)
 }
 
-
 let rec replace = (statement, abstraction) => {
     let abstractEquals = Equality.byAbstractionResolution(abstraction)
     switch (statement) {
-    | BinaryOperation(_, op, lhs, rhs) if abstractEquals(lhs) && abstractEquals(rhs)  =>
-        makeBinaryOperation(op, abstraction, abstraction)
-    | BinaryOperation(_, op, lhs, rhs) if abstractEquals(lhs) =>
-        makeBinaryOperation(op, abstraction, replace(rhs, abstraction))
-    | BinaryOperation(_, op, lhs, rhs) if abstractEquals(rhs) =>
-        makeBinaryOperation(op, replace(lhs, abstraction), abstraction)
-    | BinaryOperation(_, op, lhs, rhs) =>
-        makeBinaryOperation(op, replace(lhs, abstraction), replace(rhs, abstraction))
-    | Abstraction(_) => statement
-    | Negation(_, term) if abstractEquals(term) => abstraction
+    | BinaryOperation(_) if abstractEquals(statement) => abstraction
+    | BinaryOperation(_, op, lhs, rhs) => makeBinaryOperation(
+        op, replace(lhs, abstraction), replace(rhs, abstraction))
+    | Negation(_) if abstractEquals(statement) => abstraction
     | Negation(_, term) => makeNegation(replace(term, abstraction))
     | Variable(_, _) => statement
     | Value(_, _) => statement
+    | Abstraction(_) => statement
     };
 }
 
 let applyAbstraction = (agg, abstraction) => {
     let thisApplication = agg
-    -> Belt.Array.getExn(0)
+    -> Belt.Array.getExn(Belt.Array.length(agg)-1)
     -> clone
     -> replace(abstraction)
 
     Belt.Array.push(agg, thisApplication)
     agg
 }
-
 
 let getAbstractions = (statement) => {
   let second = ((_, b)) => b
@@ -98,4 +91,5 @@ let getAbstractions = (statement) => {
   -> Belt.Array.map(abstractOperation(knownSymbols))
   // apply abstractions onto statement, one at a time building on prior
   -> Belt.Array.reduce([statement], applyAbstraction)
+  -> Belt.Array.sliceToEnd(1)
 }
