@@ -23,3 +23,9 @@ This will print something - but there is no REPL mode
 ```
 node src/view/formatters.bs.js
 ```
+
+todo:
+* looks like an issue with debruinj conversions of statemetns with two abstractions, deferring to previous vars
+* modify identify laws to work over statements with abstractions
+* create a use case, to take a statement, generate all abstract variants, and generate all possible law matches for each variant
+* create "replace" capacity
