@@ -56,7 +56,7 @@ let getDebruinjIndices = node => {
         ->getDebruinjIndices(lhs)
         ->getDebruinjIndices(rhs)
     }
-    | Negation(_, term) => getDebruinjIndices(indices, term)
+    | UnaryOperation(_, _, term) => getDebruinjIndices(indices, term)
     | Variable(_, name) => addSymbolToIndices(indices, name)
     | Abstraction(_, symb, prop) =>
         indices

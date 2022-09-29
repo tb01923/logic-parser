@@ -12,7 +12,7 @@ let variableDebruinjResolver = (name, context) => {
 
 let implicitString = (symbolResolver, context, node) => {
 
-    let getOperator = operator => switch operator {
+    let getBinOpSymbol = operator => switch operator {
         | Conjunction => "∧"
         | Disjunction => "∨"
         | Conditional => "->"
@@ -20,14 +20,21 @@ let implicitString = (symbolResolver, context, node) => {
         | Equivalence => "≡"
     }
 
+    let getUnOpSymbol = operator => switch operator {
+        | Negation => "¬"
+    }
+
     let rec implicitString = node =>
       switch (node) {
       | BinaryOperation(_, operator, lhs, rhs) => {
         operator
-        ->getOperator
+        ->getBinOpSymbol
         ->printBinary(lhs, rhs)
       }
-      | Negation(_, term) => printUnary("¬", term)
+      | UnaryOperation(_, operator, term) =>
+        operator
+        ->getUnOpSymbol
+        ->printUnary(term)
       | Abstraction(_, symb, prop) => printAbstraction(symb, prop)
       | Variable(_, name) => symbolResolver(name, context)
       | Value(_, true) => "⊤"

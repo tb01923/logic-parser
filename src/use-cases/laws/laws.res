@@ -3,6 +3,7 @@ TODO: three variable laws not working over statements with only two vars (e.g., 
 TODO: non biconditional laws: modus ponens, modus tollens
 */
 
+open Ast
 exception ExpectingEquivalence(string)
 
 type law = (string, Ast.proposition, bool)
@@ -16,7 +17,7 @@ type transformation = {
 let makeLaw = (~bidirectional=true, name, lawString) => {
     let ast = Parser.parse(lawString)
     switch ast {
-    | Ast.BinaryOperation(_, op, _, _) => switch op {
+    | BinaryOperation(_, op, _, _) => switch op {
         | Equivalence => (name, ast, bidirectional)
         | _ => raise(ExpectingEquivalence(lawString))
     }

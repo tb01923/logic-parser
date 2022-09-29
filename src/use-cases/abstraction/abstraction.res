@@ -10,7 +10,7 @@ let rec getOperations = (node, candidates) =>
     -> Belt.Array.concat(getOperations(lhs, candidates))
     -> Belt.Array.concat(getOperations(rhs, candidates))
     }
-  | Negation(_, term) =>
+  | UnaryOperation(_, _, term) =>
     candidates
     -> Belt.Array.concat([node])
     -> Belt.Array.concat(getOperations(term, candidates))
@@ -29,7 +29,7 @@ let getOperationComplexity = node => {
 
     let rec countOperations = (acc, node) => switch node {
     | BinaryOperation(_, _, lhs, rhs) => 1 + acc + countOperations(0, lhs) + countOperations(0, rhs)
-    | Negation(_, term) => 1 + acc + countOperations(0, term)
+    | UnaryOperation(_, _, term) => 1 + acc + countOperations(0, term)
     | _ => acc
     }
 
@@ -55,8 +55,8 @@ let rec replace = (statement, abstraction) => {
     | BinaryOperation(_) if abstractEquals(statement) => abstraction
     | BinaryOperation(_, op, lhs, rhs) => makeBinaryOperation(
         op, replace(lhs, abstraction), replace(rhs, abstraction))
-    | Negation(_) if abstractEquals(statement) => abstraction
-    | Negation(_, term) => makeNegation(replace(term, abstraction))
+    | UnaryOperation(_) if abstractEquals(statement) => abstraction
+    | UnaryOperation(_, op, term) => makeUnaryOperation(op, replace(term, abstraction))
     | Variable(_, _) => statement
     | Value(_, _) => statement
     | Abstraction(_) => statement
@@ -84,12 +84,15 @@ let getAbstractions = (statement) => {
   -> Belt.Array.map(getOperationComplexity)
   -> Belt.SortArray.stableSortBy(sortByComplexity)
   -> Belt.Array.map(second)
-  // remove duplicates
+  // remove duplicates bny placing into and removing from a set
   -> Belt.Set.fromArray(~id=module(Equality.PropositionCompare))
   -> Belt.Set.toArray
-  // build abstractions from each operation
+  // box each Operation within an Abstraction
   -> Belt.Array.map(abstractOperation(knownSymbols))
-  // apply abstractions onto statement, one at a time building on prior
+  // Replace Operations with corresponding Abstraction, resulting in an incremental variants of the
+  //    original statement.  S0 is most specfic form, S1 has Abstraction1 applied, S2 has abstraction1 & 2 applied...
   -> Belt.Array.reduce([statement], applyAbstraction)
-  -> Belt.Array.sliceToEnd(1)
+  // should we slice off the original version, which by definition doesn't have any abstractions,
+  //    but it is a variation of the equation (most specific form)
+  //-> Belt.Array.sliceToEnd(1)
 }

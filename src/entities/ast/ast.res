@@ -8,9 +8,12 @@ type binaryOperator =
    | BiConditional
    | Equivalence
 
+type unaryOperator =
+   | Negation
+
 type rec proposition =
   | BinaryOperation(uuid, binaryOperator, proposition, proposition)
-  | Negation(uuid, proposition)
+  | UnaryOperation(uuid, unaryOperator, proposition)
   | Abstraction(uuid, symbol, proposition)
   | Variable(uuid, symbol)
   | Value(uuid, bool)
@@ -19,7 +22,7 @@ exception NotBinaryOperation(proposition)
 
 let getId = node => switch node {
   | BinaryOperation(uuid, _, _, _) => uuid
-  | Negation(uuid, _) => uuid
+  | UnaryOperation(uuid, _, _) => uuid
   | Abstraction(uuid, _, _) => uuid
   | Variable(uuid, _) => uuid
   | Value(uuid, _) => uuid
@@ -37,7 +40,10 @@ let makeBinaryOperation = (operator, lhs, rhs) => switch operator {
     | BiConditional => makeBiConditional(lhs, rhs)
     | Equivalence => makeEquivalence(lhs, rhs)
 }
-let makeNegation = (term) => Negation(Uuid.V4.make(), term)
+let makeNegation = (term) => UnaryOperation(Uuid.V4.make(), Negation, term)
+let makeUnaryOperation = (operator, term) => switch operator {
+    | Negation => makeNegation(term)
+}
 let makeVariable = name => Variable(Uuid.V4.make(), name)
 let makeValue = b => Value(Uuid.V4.make(), b)
 let makeAbstraction = (symb, prop) => Abstraction(Uuid.V4.make(), symb, prop)

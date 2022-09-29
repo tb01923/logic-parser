@@ -1,7 +1,7 @@
 open Ast
 open Debruinj
 
-let opEqual = (opA, opB) => switch (opA, opB) {
+let binOpEquals = (opA, opB) => switch (opA, opB) {
 | (Conjunction, Conjunction) => true
 | (Disjunction, Disjunction) => true
 | (Conditional, Conditional) => true
@@ -9,14 +9,19 @@ let opEqual = (opA, opB) => switch (opA, opB) {
 | (_, _) => false
 }
 
+let unOpEquals = (opA, opB) => switch (opA, opB) {
+| (Negation, Negation) => true
+}
+
 let equals = (symbolEquals) => {
 
     let rec equals = (astA, astB) => switch (astA, astB) {
     | (Value(_, a), Value(_, b)) => a === b
-    | (Negation(_, termA), Negation(_, termB)) => equals(termA, termB)
+    | (UnaryOperation(_, opA, termA), UnaryOperation(_, opB, termB)) =>
+        unOpEquals(opA, opB) && equals(termA, termB)
     | (Variable(_, a), Variable(_, b)) => symbolEquals(a, b)
     | (BinaryOperation(_, opA, lhsA, rhsA), BinaryOperation(_, opB, lhsB, rhsB)) =>
-        opEqual(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)
+        binOpEquals(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)
     // todo: maybe throw an exception IF symbols are equals, but the propositions are not???
     | (Abstraction(_, a, _), Abstraction(_, b, _)) => symbolEquals(a, b)
     // todo: this seems like a hack, use variable to resolve debruinj index of abstraction
@@ -56,12 +61,15 @@ let byName = (stmtA, stmtB) => {
 
 let rec byAbstractionResolution = (astA, astB) =>
     switch (astA, astB) {
-    | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB))) =>
-    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    // Binary Operation Equals with intentional fall through
+    | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB)))
     | (Abstraction(_, _, BinaryOperation(_, opA, lhsA, rhsA)), BinaryOperation(_, opB, lhsB, rhsB)) =>
-    opEqual(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
-    | (Abstraction(_, _, Negation(_, termA)), Negation(_, termB)) => byAbstractionResolution(termA, termB)
-    | (Negation(_, termA), Abstraction(_, _, Negation(_, termB))) => byAbstractionResolution(termA, termB)
+        binOpEquals(opA, opB) && byAbstractionResolution(lhsA, lhsB) && byAbstractionResolution(rhsA, rhsB)
+    // UnaryOperation Equals with intentional fall through
+    | (Abstraction(_, _, UnaryOperation(_, opA, termA)), UnaryOperation(_, opB, termB))
+    | (UnaryOperation(_, opA, termA), Abstraction(_, _, UnaryOperation(_, opB, termB))) =>
+        unOpEquals(opA, opB) && byAbstractionResolution(termA, termB)
+    // defer to equality by variable name
     | (_, _) => byName(astA, astB)
     }
 

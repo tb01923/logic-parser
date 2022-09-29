@@ -1,7 +1,12 @@
+open Ast
+open Equality
 open Laws
+
 let makeTransformation = (law, side, statement) => {
     {matchedLaw: law, matchedSide: side, statementMatched: statement}
 }
+
+let equals = byDebruinj
 
 let attemptMatch = (statement, law) => {
     let (name, ast, bidirectional) = law
@@ -9,7 +14,7 @@ let attemptMatch = (statement, law) => {
     // two partial applications
     //  1. ctx for lhs/rhs of law is derived from entire law (keep debruinj index consistent on both sides)
     //  2. statement applied to simplify reading the switch
-    let equals = Equality.byDebruinj(~bCtxSrc=ast, statement)
+    let equals = equals(~bCtxSrc=ast, statement)
 
     let equivalenceMatch = (lhs, rhs) => switch (bidirectional, equals(lhs), equals(rhs)) {
     // both sides of the law are matches, and law is applied bidirectionally
@@ -22,10 +27,11 @@ let attemptMatch = (statement, law) => {
     | (_) => None
     }
 
-    // short-circuit if called with something otehr than BiConditional
+    // short-circuit if called with something otehr than Equivalence
+    //  todo: consider how to handle non-equivalence laws
     switch ast {
-    | Ast.BinaryOperation(_, Equivalence, lhs, rhs) => equivalenceMatch(lhs, rhs)
-    | Ast.BinaryOperation(_) => raise(ExpectingEquivalence(name))
+    | BinaryOperation(_, Equivalence, lhs, rhs) => equivalenceMatch(lhs, rhs)
+    | BinaryOperation(_) => raise(ExpectingEquivalence(name))
     | _ => raise(ExpectingEquivalence(name))
     }
 }
@@ -37,7 +43,7 @@ let rec identifyLaws = statement => {
         -> Belt.Array.concatMany
 
     let subMatches = switch statement {
-    | Negation(_, term) => identifyLaws(term)
+    | UnaryOperation(_, _, term) => identifyLaws(term)
     | BinaryOperation(_,_, lhs, rhs) => Belt.Array.concat(identifyLaws(lhs), identifyLaws(rhs))
     | _ => []
     }
