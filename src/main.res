@@ -3,9 +3,8 @@ open Clone
 open LawApplication
 open Formatters
 
-let printLawsFor = str => {
-    str
-    -> Parser.parse
+let printLawsFor = state => {
+    state
     -> identifyLaws
     -> Belt.Array.forEach(transformation => {
         let (name, ast, _) = transformation.matchedLaw
@@ -34,14 +33,16 @@ let printLawsFor = str => {
 
 //let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
 //let x = Parser.parse("not(a and b) and not(b or c)")
-let x = Parser.parse("a and not(b) or (c and not(b))")
-//let x = Parser.parse("a and b")
+//let x = Parser.parse("a and not(b) or (c and not(b))")
+let x = Parser.parse("a and b or b and c")
 
 
 let xs = Abstraction.getAbstractions(x)
 Belt.Array.forEach(xs, (x) => {
-    let str = "Variation: " ++ x->printImplicit ++ " is expressed as " ++ x->printImplicitDeBruinj
+    let str = "Abstraction: " ++ x->printImplicit ++ " is expressed as " ++ x->printImplicitDeBruinj
     Js.Console.log(str)
+    printLawsFor(x)
+    Js.Console.log("---------------------------")
 })
 
 
