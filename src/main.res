@@ -33,9 +33,9 @@ let printLawsFor = str => {
 
 
 //let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
-let x = Parser.parse("not(a and b) and not(b or c)")
-//let x = Parser.parse("a and not(b)")
-//let y = Parser.parse("a and b")
+//let x = Parser.parse("not(a and b) and not(b or c)")
+let x = Parser.parse("a and not(b) or (c and not(b))")
+//let x = Parser.parse("a and b")
 
 
 let xs = Abstraction.getAbstractions(x)
