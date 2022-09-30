@@ -34,7 +34,7 @@ let printLawsFor = state => {
 //let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
 //let x = Parser.parse("not(a and b) and not(a and b)")
 //let x = Parser.parse("a and not(b) or (c and not(b))")
-let x = Parser.parse("a and b or not(b and a)")
+let x = Parser.parse("a and b and not(a and b)")
 //let x = Parser.parse("(q and b)")
 
 
