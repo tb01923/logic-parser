@@ -49,14 +49,14 @@ let abstractOperation = (knownSymbols, operation) => {
     makeAbstraction(nextSymbol, operation)
 }
 
-let rec replace = (statement, abstraction) => {
+let rec performAbstraction = (statement, abstraction) => {
     let abstractEquals = Equality.byAbstractionResolution(abstraction)
     switch (statement) {
     | BinaryOperation(_) if abstractEquals(statement) => abstraction
     | BinaryOperation(_, op, lhs, rhs) => makeBinaryOperation(
-        op, replace(lhs, abstraction), replace(rhs, abstraction))
+        op, performAbstraction(lhs, abstraction), performAbstraction(rhs, abstraction))
     | UnaryOperation(_) if abstractEquals(statement) => abstraction
-    | UnaryOperation(_, op, term) => makeUnaryOperation(op, replace(term, abstraction))
+    | UnaryOperation(_, op, term) => makeUnaryOperation(op, performAbstraction(term, abstraction))
     | Variable(_, _) => statement
     | Value(_, _) => statement
     | Abstraction(_) => statement
@@ -64,11 +64,16 @@ let rec replace = (statement, abstraction) => {
 }
 
 let applyAbstraction = (agg, abstraction) => {
-    let thisApplication = agg
+    let thisApplication =
+    agg
+    // build on the most recently applied abstraction
     -> Belt.Array.getExn(Belt.Array.length(agg)-1)
     -> clone
-    -> replace(abstraction)
+    // take the next abstraction (passed in function) and apply to the version
+    //    of the statement, with all previous abstractions already applied
+    -> performAbstraction(abstraction)
 
+    // record this as the most recent (and most abstract) version of the statement
     Belt.Array.push(agg, thisApplication)
     agg
 }
