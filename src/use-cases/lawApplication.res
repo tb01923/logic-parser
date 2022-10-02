@@ -2,6 +2,21 @@ open Ast
 open Equality
 open Laws
 
+type matchedSide = LHS | RHS;
+type transformation = {
+    matchedLaw: law,
+    matchedSide: matchedSide,
+    statementMatched: Ast.proposition
+}
+let getLawAst = (thisLaw: law) => {
+    let (_, lawAst, _) = thisLaw
+    lawAst
+}
+let getLawName = (thisLaw: law) => {
+   let (name, _, _) = thisLaw
+   name
+}
+
 let makeTransformation = (law, side, statement) => {
     {matchedLaw: law, matchedSide: side, statementMatched: statement}
 }

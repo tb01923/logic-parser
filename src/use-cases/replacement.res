@@ -1,5 +1,5 @@
 open Ast
-open Laws
+open LawApplication
 
 let getAbstractionForSymbol = (abstractionsBySymbol, symbol) => {
     switch (Belt.HashMap.String.get(abstractionsBySymbol, symbol)) {

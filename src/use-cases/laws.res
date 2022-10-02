@@ -7,21 +7,6 @@ open Ast
 exception ExpectingEquivalence(string)
 
 type law = (string, Ast.proposition, bool)
-let getLawAst = (thisLaw: law) => {
-    let (_, lawAst, _) = thisLaw
-    lawAst
-}
-let getLawName = (thisLaw: law) => {
-   let (name, _, _) = thisLaw
-   name
-}
-
-type matchedSide = LHS | RHS;
-type transformation = {
-    matchedLaw: law,
-    matchedSide: matchedSide,
-    statementMatched: Ast.proposition
-}
 
 let makeLaw = (~bidirectional=true, name, lawString) => {
     let ast = Parser.parse(lawString)

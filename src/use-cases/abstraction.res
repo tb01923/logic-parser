@@ -1,6 +1,7 @@
 open Ast
 open Clone
 open Debruinj
+open Heuristic
 
 let rec getOperations = (node, candidates) =>
   switch node {
@@ -17,28 +18,6 @@ let rec getOperations = (node, candidates) =>
   | _ => candidates
   }
 
-let getOperationComplexity = node => {
-    // helpers to count distinct variable names
-    let accumulateMapReducer = (acc, _, _) => acc + 1
-    let countItems = Belt.HashMap.String.reduce(_, 0, accumulateMapReducer)
-
-    let numVariables = node
-    -> getDebruinjIndices
-    -> countItems
-    -> Belt.Int.toFloat
-
-    let rec countOperations = (acc, node) => switch node {
-    | BinaryOperation(_, _, lhs, rhs) => 1 + acc + countOperations(0, lhs) + countOperations(0, rhs)
-    | UnaryOperation(_, _, term) => 1 + acc + countOperations(0, term)
-    | _ => acc
-    }
-
-    let numOperations = node
-    -> countOperations(0, _)
-    -> Belt.Int.toFloat
-
-    (Js.Math.pow_float(~base=numVariables, ~exp=numOperations), node)
-}
 
 let abstractOperation = (knownSymbols, operation) => {
     // use the debruinj logic to get a symobl for this abstraction,
@@ -86,7 +65,7 @@ let getAbstractions = (statement) => {
   statement
   -> getOperations([])
   // score each operation for complexity, sort for simplicity first, then drop the scores
-  -> Belt.Array.map(getOperationComplexity)
+  -> Belt.Array.map(node => (variablesRaisedToOperations(node), node))
   -> Belt.SortArray.stableSortBy(sortByComplexity)
   -> Belt.Array.map(second)
   // remove duplicates bny placing into and removing from a set

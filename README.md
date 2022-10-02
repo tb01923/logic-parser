@@ -7,11 +7,6 @@ its on the todo list.
 
 ## execution
 
-### JavaScript version
-```
-npm install
-node main.js
-```
 
 ### ReScript version
 ```
@@ -21,7 +16,7 @@ rescript build
 ```
 This will print something - but there is no REPL mode
 ```
-node src/view/formatters.bs.js
+node src/main.bs.js
 ```
 
 todo:

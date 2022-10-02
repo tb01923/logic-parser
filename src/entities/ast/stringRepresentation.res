@@ -55,3 +55,8 @@ let implicitString = (symbolResolver, context, node) => {
 
 let printImplicit = node => implicitString(variableNameResolver, None, node)
 let printImplicitDeBruinj = node => implicitString(variableDebruinjResolver, Debruinj.getDebruinjIndices(node), node)
+
+let hash = node =>
+    node
+    -> printImplicit
+    -> ReScriptHash.Sha256.make
