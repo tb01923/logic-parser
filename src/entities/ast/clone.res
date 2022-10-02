@@ -34,7 +34,17 @@ let cloneVariable = (name, equationAlphabet, targetAlphabet) => {
    }
 }
 
-let clone = (equationAlphabet, targetAlphabet) => {
+let clone = (~targetAlphabet=?, ~equationAlphabet=?, equation) => {
+    // get the alphabet of the equation
+    let equationAlphabet =
+    equationAlphabet
+    ->Belt.Option.getWithDefault(Debruinj.getDebruinjIndices(equation))
+
+    // use target alphabet provided OR default to current alphabet
+    let targetAlphabet =
+    targetAlphabet
+    ->Belt.Option.getWithDefault(equationAlphabet)
+
     // recursive _clone function that doesn't need to pass: originalIndices, newIndices
     //   to make code more readable
     let rec _clone = (node) =>
@@ -46,20 +56,10 @@ let clone = (equationAlphabet, targetAlphabet) => {
       | Value(_, boolean) => makeValue(boolean)
       };
 
-    // return recursive function
-    _clone
+    // apply the recursive function
+    _clone(equation)
 }
 
-let clone = (~targetAlphabet=?, equation) => {
-    // get the alphabet of the equation
-    let equationAlphabet = Debruinj.getDebruinjIndices(equation)
-
-    // use target alphabet provided OR default to current alphabet
-    let targetAlphabet = Belt.Option.getWithDefault(targetAlphabet, equationAlphabet)
-
-    // invoke
-    clone(equationAlphabet, targetAlphabet, equation);
-};
 //
 //let hm = Belt.HashMap.String.make(~hintSize=10)
 //Belt.HashMap.String.set(hm, "p", 0)
