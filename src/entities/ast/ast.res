@@ -55,3 +55,10 @@ let getRhs = op => switch op {
    | BinaryOperation(_, _, _, rhs) => rhs
    | _ => raise(NotBinaryOperation(op))
 }
+
+let rec hasAbstraction = ast => switch ast {
+| BinaryOperation(_, _, lhs, rhs) => hasAbstraction(lhs) || hasAbstraction(rhs)
+| UnaryOperation(_, _, t) => hasAbstraction(t)
+| Abstraction(_) => true
+| _ => false
+}

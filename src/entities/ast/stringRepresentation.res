@@ -44,7 +44,9 @@ let implicitString = (symbolResolver, context, node) => {
       "(" ++ implicitString(lhs) ++ " " ++ op ++ " " ++ implicitString(rhs) ++ ")";
     }
     and printUnary = (op, term) => {
-      op ++ "(" ++ implicitString(term) ++ ")";
+        // not operator shouldn't use parens
+      //op ++ "(" ++ implicitString(term) ++ ")";
+      op ++ implicitString(term) ;
     }
     and printAbstraction = (symb, prop) => {
      // this isn't the right way to express the substitution, but it works okay for now
@@ -59,4 +61,4 @@ let printImplicitDeBruinj = node => implicitString(variableDebruinjResolver, Deb
 let hash = node =>
     node
     -> printImplicit
-    -> ReScriptHash.Sha256.make
+//    -> ReScriptHash.Sha256.make

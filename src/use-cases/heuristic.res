@@ -17,9 +17,14 @@ let variablesRaisedToOperations = node => {
     | _ => acc
     }
 
+    let binaryOpBump = switch node {
+    | BinaryOperation(_) => 1.
+    | _ => 0.
+    }
+
     let numOperations = node
     -> countOperations(0, _)
     -> Belt.Int.toFloat
 
-    Js.Math.pow_float(~base=numVariables, ~exp=numOperations)
+    Js.Math.pow_float(~base=numVariables +. binaryOpBump, ~exp=numOperations)
 }
