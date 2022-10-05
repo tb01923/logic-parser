@@ -8,6 +8,8 @@ type transformation = {
     matchedSide: matchedSide,
     statementMatched: Ast.proposition
 }
+
+// todo: these belong in law
 let getLawAst = (thisLaw: law) => {
     let (_, lawAst, _) = thisLaw
     lawAst
@@ -52,6 +54,8 @@ let attemptMatch = (statement, law) => {
 }
 
 let rec identifyLaws = statement => {
+
+    let t = StringRepresentation.printImplicit(statement)
 
     let theseMatches = laws
         -> Belt.Array.keepMap(attemptMatch(statement))
