@@ -57,31 +57,26 @@ let initializeHistory = statement =>[(Initial, statement)]
 
 let solve = statement => {
 
-    let chainIntoNext = ((statement, history)) => next(statement, history)
+    let chainIntoNext = arr => Belt.Array.flatMap(arr, ((statement, history)) => next(statement, history))
 
-    let rec invokeCallAndIterate = (i, previousIteratorResultsOpt) => {
+    let rec invokeNextAndIterate = (i, previousIteratorResultsOpt) => {
         let previousIteratorResults = Belt.Option.getWithDefault(previousIteratorResultsOpt, [])
 
         let nextResults = switch previousIteratorResultsOpt {
         | None => next(statement, initializeHistory(statement))
-        | Some(_) => Belt.Array.flatMap(previousIteratorResults, chainIntoNext)
-        }
-
-        let n = switch Belt.Array.length(nextResults) {
-        | 0 => 0
-        | _ => i - 1
+        | Some(_) => chainIntoNext(previousIteratorResults)
         }
 
         let aggregateResults = Belt.Array.concat(nextResults, previousIteratorResults)
 
+        let n =  Belt.Array.length(nextResults) === 0 ? 0 : i - 1
         iterate(n, Some(aggregateResults))
     }
     and iterate = (i, previousIteratorResultsOpt) => {
         switch (previousIteratorResultsOpt, i)  {
         | (None, 0) => Some([(statement, initializeHistory(statement))])
         | (Some(_), 0) => previousIteratorResultsOpt
-        | (None, _) => invokeCallAndIterate(i, previousIteratorResultsOpt)
-        | (Some(_), _) => invokeCallAndIterate(i, previousIteratorResultsOpt)
+        | (None | Some(_), _) => invokeNextAndIterate(i, previousIteratorResultsOpt)
         }
     }
     and iterateOld  = (i, prior) => {
