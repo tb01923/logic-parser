@@ -5,6 +5,8 @@ type solutionStep =
     | Initial
     | Trace (string)
 
+let numberOfIterations = 4
+
 let visitedStatements : Belt.HashMap.String.t<bool> = Belt.HashMap.String.make(~hintSize=10)
 
 let next = (statement, history) => {
@@ -55,6 +57,18 @@ let next = (statement, history) => {
 
 let initializeHistory = statement =>[(Initial, statement)]
 
+let shouldShortCircuit = (nextResults) => {
+    // if there aere
+    let containsOptimal = nextResults
+    ->Belt.Array.map(((a, _)) => a)
+    ->Belt.Array.keep(Heuristic.isOptimalSolution)
+    ->Belt.Array.length
+    ->(l => l > 0)
+
+    let shortCircuit =  (Belt.Array.length(nextResults) === 0) || containsOptimal
+    shortCircuit
+}
+
 let solve = statement => {
 
     let chainIntoNext = arr => Belt.Array.flatMap(arr, ((statement, history)) => next(statement, history))
@@ -67,9 +81,14 @@ let solve = statement => {
         | Some(_) => chainIntoNext(previousIteratorResults)
         }
 
-        let aggregateResults = Belt.Array.concat(nextResults, previousIteratorResults)
+        let n =  shouldShortCircuit(nextResults) ? 0 : i - 1
 
-        let n =  Belt.Array.length(nextResults) === 0 ? 0 : i - 1
+        let aggregateResults =
+        nextResults
+        //->Belt.SortArray.stableSortBy(((a, _), (b, _)) => Heuristic.compare(a, b))
+        ->Belt.Array.concat(previousIteratorResults)
+
+
         iterate(n, Some(aggregateResults))
     }
     and iterate = (i, previousIteratorResultsOpt) => {
@@ -79,32 +98,8 @@ let solve = statement => {
         | (None | Some(_), _) => invokeNextAndIterate(i, previousIteratorResultsOpt)
         }
     }
-    and iterateOld  = (i, prior) => {
-        switch (prior, i) {
-        | (None, 0) => Some([(statement, initializeHistory(statement))])
-        | (Some(_), 0) => prior
-        | (None, _) => {
-            let it = next(statement, initializeHistory(statement))
-            iterate(i - 1, Some(it))
-        }
-        | (Some(priorIt), _) => {
-            let it = priorIt
-            ->Belt.Array.flatMap(((statement, history)) => next(statement, history))
 
-            // if there is nothing next, sort circuit iterations by moving i to 0
-            let n = switch Belt.Array.length(it) {
-            | 0 => 0
-            | _ => i -1
-            }
-
-            let all = Belt.Array.concat(it, priorIt)
-            iterate(n, Some(all))
-        }
-    }}
-
-    let res = iterate(1, None)
-
-    res
+    iterate(numberOfIterations, None)
     ->Belt.Option.getExn
     ->Belt.Array.keepMap(((statement, history)) => switch Ast.hasAbstraction(statement) {
     | true => None

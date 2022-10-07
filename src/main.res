@@ -40,7 +40,7 @@ let solve = ast =>
 let abstract = ast =>
     ast
     ->Abstraction.getAbstractions
-    ->Belt.Array.getExn(3)
+    ->Belt.Array.getExn(4)
     ->abstraction => {
         Js.Console.log("")
         Js.Console.log("Abstraction")
@@ -86,9 +86,20 @@ let abstract = ast =>
 
 
 //"not(a) and a"
-"not(a and b) and not(a and b)"
+"not(q) or p"
+//"(not(a and b) and not(a and b) or (a and b)) or F"
+//"(not(a and b) or not(a and b) or (a and b))"
 //"a and b or not(a and b)"
 //"a and a and a and a and a"
 //"p or q and p"
 ->Parser.parse
 ->solve
+
+
+/*
+     (a and b) and not(a and b)
+
+     c and not c
+     c and d
+     e
+*/
