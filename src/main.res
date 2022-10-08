@@ -15,8 +15,9 @@ let print = (step, x) => {
     let score = Heuristic.variablesRaisedToOperations(x)
     let l = getLabel(step)
     let tabs = switch Js.String2.length(l) {
-    | x if x < 6 => "\t\t\t"
-    | x if x < 15 => "\t\t"
+    | x if x < 6 => "\t\t\t\t"
+    | x if x < 15 => "\t\t\t"
+    | x if x < 16 => "\t\t"
     | _ => "\t"
     }
     Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(x))
@@ -30,11 +31,8 @@ let solve = ast =>
         ast
     })
     ->BruteForceSolver.solve
-    ->Belt.Array.map(((statement, history)) => (Heuristic.variablesRaisedToOperations(statement), statement, history))
-    ->Belt.SortArray.stableSortBy(((scA, _, _), (scB, _, _)) => Belt.Float.toInt(scA -. scB))
-    ->(arr => arr[0])
-    ->((_, _, history)) => history
-    ->Belt.Array.map(((step, statement)) => print(step, statement) )
+    ->((_, history)) => history
+    ->Belt.Array.map(((step, statement)) => print(step, statement))
     ->ignore
 
 let abstract = ast =>
@@ -57,7 +55,6 @@ let abstract = ast =>
     }
     ->LawApplication.identifyLaws
     ->Belt.Array.map((trans) => {
-//
         let {matchedLaw} = trans
 
         LawApplication.getLawAst(matchedLaw)

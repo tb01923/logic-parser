@@ -6,11 +6,13 @@ let countItems = Belt.HashMap.String.reduce(_, 0, accumulateMapReducer)
 
 let rec countBinary = (acc, node) => switch node {
 | BinaryOperation(_, _, lhs, rhs) => 1 + acc + countBinary(0, lhs) + countBinary(0, rhs)
+| UnaryOperation(_, _, term) => countBinary(0, term)
 | _ => acc
 }
 
 let rec countUnary = (acc, node) => switch node {
 | UnaryOperation(_, _, term) => 1 + acc + countUnary(0, term)
+| BinaryOperation(_, _, lhs, rhs) => acc + countUnary(0, lhs) + countUnary(0, rhs)
 | _ => acc
 }
 

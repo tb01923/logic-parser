@@ -1,11 +1,14 @@
 type uuid = string
 type symbol = string
 
+
+// todo: support all 16 binary operations: https://en.wikipedia.org/wiki/Truth_table
 type binaryOperator =
    | Conjunction
    | Disjunction
    | Conditional
    | BiConditional
+   // support equivalence operator for laws
    | Equivalence
 
 type unaryOperator =
