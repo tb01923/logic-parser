@@ -1,89 +1,102 @@
-open Debruinj
-open Clone
-open LawApplication
-open Formatters
 
-let printLawsFor = state => {
-    state
-    -> identifyLaws
-    -> Belt.Array.forEach(transformation => {
-        let (name, ast, _) = transformation.matchedLaw
 
-        Js.Console.log(
-            printImplicit(transformation.statementMatched) ++
-            " matches " ++ name ++ ": " ++ printImplicit(ast)
-        )
-
-        let printSide = transformSide => {
-            transformation.statementMatched
-            -> getDebruinjIndices
-            -> clone(ast, ~targetAlphabet=_)
-            -> transformSide
-            -> printImplicit
-            -> str => Js.Console.log(" suggest: " ++ str)
-        }
-
-        switch transformation.matchedSide {
-        | LHS => printSide(Ast.getRhs)
-        | RHS => printSide(Ast.getLhs)
-        }
-    })
+let getLabel = tag => switch tag {
+    | BruteForceSolver.AbstractionStep => "abstraction"
+    | BruteForceSolver.ApplicationStep({ matchedLaw, _, _ }) => {
+        let (name, _, _) = matchedLaw
+        name
+    }
+    | TransformationResult => "transformation"
+    | Initial => "initial"
+    | Trace (s) => s
 }
 
-
-//let x = Parser.parse("a and b or c and not(a or b) and not(a or c) and not(c) and (a or b)")
-//let x = Parser.parse("not(a and b) and not(a and b)")
-//let x = Parser.parse("a and not(b) or (c and not(b))")
-let x = Parser.parse("a and b or not(a and b)")
-//let x = Parser.parse("a and (b or c)")
-
-let printSide = side => switch side {
-| Laws.LHS => "LHS"
-| Laws.RHS => "RHS"
-}
-
-let xs = Abstraction.getAbstractions(x)
-
-let print = (l, x) => {
-    let (score, _) = Abstraction.getOperationComplexity(x)
+let print = (step, x) => {
+    let score = Heuristic.variablesRaisedToOperations(x)
+    let l = getLabel(step)
     let tabs = switch Js.String2.length(l) {
-    | x if x < 15 => "\t\t"
+    | x if x < 6 => "\t\t\t\t"
+    | x if x < 15 => "\t\t\t"
+    | x if x < 16 => "\t\t"
     | _ => "\t"
     }
-    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  printImplicit(x))
+    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(x))
 }
 
-print("original", x)
-Belt.Array.forEach(xs, (abstraction) => {
-    print("abstraction", abstraction)
-
-    let applicableLaws = identifyLaws(abstraction)
-    Belt.Array.forEach(applicableLaws, (applicableLaw) => {
-        let replacement = Replacement.replace(
-            abstraction,
-            applicableLaw.statementMatched,
-            Laws.getLawAst(applicableLaw.matchedLaw),
-            applicableLaw.matchedSide)
-
-        let label = " " ++ Laws.getLawName(applicableLaw.matchedLaw)
-        print(label, replacement)
+let solve = ast =>
+    ast
+    ->(ast => {
+        StringRepresentation.printImplicit(ast)->Js.Console.log
+        Js.Console.log("_________")
+        ast
     })
-})
+    ->BruteForceSolver.solve
+    ->((_, history)) => history
+    ->Belt.Array.map(((step, statement)) => print(step, statement))
+    ->ignore
 
-original:		16	((a ∧ b) ∨ ¬((a ∧ b)))
-abstraction:		16	((a ∧ b) ∨ ¬((a ∧ b)))
- Commutative<and>:	16	((b ∧ a) ∨ ¬((a ∧ b)))
- DeMorgan<not(and)>:	32	((a ∧ b) ∨ (¬(a) ∨ ¬(b)))
- Commutative<and>:	16	((a ∧ b) ∨ ¬((b ∧ a)))
-abstraction:		9	([c/(a ∧ b)] ∨ ¬([c/(a ∧ b)]))
- Tautology:		1	⊤
-abstraction:		4	([c/(a ∧ b)] ∨ [d/¬((a ∧ b))])
- Commutative<or>:	16	(¬((a ∧ b)) ∨ (a ∧ b))
-abstraction:		1	[e/((a ∧ b) ∨ ¬((a ∧ b)))]
+let abstract = ast =>
+    ast
+    ->Abstraction.getAbstractions
+    ->Belt.Array.getExn(4)
+    ->abstraction => {
+        Js.Console.log("")
+        Js.Console.log("Abstraction")
+        Js.Console.log("")
+        abstraction
+        ->StringRepresentation.printImplicit
+        ->Js.Console.log
 
-//printLawsFor("(T and T)")
-//printLawsFor("not(c and d) and not(d or c)")
-//printLawsFor("a and b and a")
+        Js.Console.log("")
+        Js.Console.log("Laws")
+        Js.Console.log("")
 
-// a and not(a) <=> F
-// c and not(c) <=> F
+        abstraction
+    }
+    ->LawApplication.identifyLaws
+    ->Belt.Array.map((trans) => {
+        let {matchedLaw} = trans
+
+        LawApplication.getLawAst(matchedLaw)
+        ->StringRepresentation.printImplicit
+        ->Js.Console.log
+
+        trans
+    })
+    ->Belt.Array.getExn(0)
+    ->(trans: LawApplication.transformation ) => {
+
+        let {matchedLaw, statementMatched, matchedSide} = trans
+        let nextStatement = Replacement.replace(
+            abstraction,
+            statementMatched,
+            LawApplication.getLawAst(matchedLaw),
+            matchedSide)
+
+        nextStatement
+        ->StringRepresentation.printImplicit
+        ->Js.Console.log
+    }
+//    ->Belt.Array.map(StringRepresentation.printImplicit)
+//    ->Belt.Array.map(Js.Console.log)
+    ->ignore
+
+
+//"not(a) and a"
+"not(q) or p"
+//"(not(a and b) and not(a and b) or (a and b)) or F"
+//"(not(a and b) or not(a and b) or (a and b))"
+//"a and b or not(a and b)"
+//"a and a and a and a and a"
+//"p or q and p"
+->Parser.parse
+->solve
+
+
+/*
+     (a and b) and not(a and b)
+
+     c and not c
+     c and d
+     e
+*/

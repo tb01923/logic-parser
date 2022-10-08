@@ -1,11 +1,14 @@
 type uuid = string
 type symbol = string
 
+
+// todo: support all 16 binary operations: https://en.wikipedia.org/wiki/Truth_table
 type binaryOperator =
    | Conjunction
    | Disjunction
    | Conditional
    | BiConditional
+   // support equivalence operator for laws
    | Equivalence
 
 type unaryOperator =
@@ -54,4 +57,11 @@ let getLhs = op => switch op {
 let getRhs = op => switch op {
    | BinaryOperation(_, _, _, rhs) => rhs
    | _ => raise(NotBinaryOperation(op))
+}
+
+let rec hasAbstraction = ast => switch ast {
+| BinaryOperation(_, _, lhs, rhs) => hasAbstraction(lhs) || hasAbstraction(rhs)
+| UnaryOperation(_, _, t) => hasAbstraction(t)
+| Abstraction(_) => true
+| _ => false
 }
