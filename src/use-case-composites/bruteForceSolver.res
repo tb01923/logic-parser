@@ -1,4 +1,5 @@
 
+exception UninitializedSearch(Ast.proposition)
 let numberOfIterations = 4
 
 
@@ -26,39 +27,27 @@ let containsSolution = neighbors => {
     shortCircuit
 }
 
+let makeInitialSolution = statement => PropositionSearchDomain.makeSolutionArray(statement)
 
-let solve = (statement: Ast.proposition) : PropositionSearchDomain.solutionWithSteps => {
+let solve = (statement) : PropositionSearchDomain.solutionWithSteps => {
 
-
-    let rec invokeNextAndIterate = (i, solutions) => {
-
-        let neighbors = switch solutions {
-        | None => PropositionSearchDomain.neighbors(statement)
-        | Some(arr) => PropositionSearchDomain.neighborsForMany(arr)
-        }
-
-        let n = (containsSolution(neighbors)) ? 0 : i - 1
-
-        iterate(n, Some(neighbors))
-    }
-    and iterate = (i, solutions) => {
-        switch (i, solutions)  {
-        | (0, None) => PropositionSearchDomain.makeSolutionArray(statement)->Some
-        | (0, Some(_)) => solutions
-        | (_, None | Some(_)) => invokeNextAndIterate(i, solutions)
-        }
+    let rec iterate = (i, solutions) => {
+        switch i  {
+        | 0 => solutions
+        | _ => {
+            let neighbors = PropositionSearchDomain.neighborsForMany(solutions)
+            let n = (containsSolution(neighbors)) ? 0 : i - 1
+            iterate(n, neighbors)
+        }}
     }
 
-    iterate(numberOfIterations, PropositionSearchDomain.makeSolutionArray(statement)->Some)
-    ->Belt.Option.getExn
-    // eliminate any solutions that are still abstractions
-//    ->Belt.Array.keepMap(((statement, history)) => switch Ast.hasAbstraction(statement) {
-//    | true => None
-//    | false => Some((statement, history))
-//    })
-    // score each last remaining neighbor, pick the best, drop the scoring
+    iterate(numberOfIterations, makeInitialSolution(statement))
+    // score each neighbor
     ->Belt.Array.map(((statement, history)) => (Heuristic.variablesRaisedToOperations(statement), (statement, history)))
+    // sort by score
     ->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => Belt.Float.toInt(scA -. scB))
+    // pick best
     ->(arr => arr[0])
+    // disca
     ->((_, solution)) => solution
 }

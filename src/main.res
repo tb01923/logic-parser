@@ -78,7 +78,8 @@ let abstract = ast =>
     ->ignore
 
 
-"not(a) and a"
+"a and b"
+//"not(a) and a"
 //"not(q) or p"
 //"(not(a and b) and not(a and b) or (a and b)) or F"
 //"(not(a and b) or not(a and b) or (a and b))"
