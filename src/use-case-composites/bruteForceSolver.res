@@ -1,13 +1,3 @@
-type solutionStep =
-    AbstractionStep
-    | ApplicationStep(LawApplication.transformation)
-    | TransformationResult
-    | Initial
-    | Trace (string)
-
-type solutionHistory = Belt.Array.t<(solutionStep, Ast.proposition)>
-type solutionWithHistory = (Ast.proposition, solutionHistory)
-type solutionWithHistoryArr = Belt.Array.t<solutionWithHistory>
 
 let numberOfIterations = 4
 
@@ -24,111 +14,51 @@ let isNew = ((applicableLaw, nextStatement)) => {
     }}
 }
 
-let recordHistory = (statement, abstraction, applicableLaw, nextStatement, history) : solutionHistory => {
-
-    let thisHistory : solutionHistory = Belt.Array.copy(history)
-
-    // only push abstraction if it differs from statement
-    switch Equality.byDebruinj(statement, abstraction) {
-    | true => ()
-    | false => Belt.Array.push(thisHistory, (AbstractionStep, abstraction))
-    }
-
-    // todo: perhaps push the matching sub-statement onto this portion of the history
-    Belt.Array.push(thisHistory, (
-        ApplicationStep(applicableLaw),
-        LawApplication.getLawAst(applicableLaw.matchedLaw)))
-
-    // todo consider adding this... ooops we did :)
-    Belt.Array.push(thisHistory, (TransformationResult, nextStatement))
-
-    thisHistory
-}
-
-let applyLawsToAbstraction = (abstraction, statement, history: solutionHistory) => {
-    abstraction
-    ->LawApplication.identifyLaws
-    ->Belt.Array.map(applicableLaw => {
-
-        let law  =applicableLaw.matchedLaw
-
-
-        // apply law tp current abstraction, providing a form for the next epoch
-        (applicableLaw, Replacement.replace(
-            abstraction,
-            applicableLaw.statementMatched,
-            LawApplication.getLawAst(applicableLaw.matchedLaw),
-            applicableLaw.matchedSide))
-    })
-    ->Belt.Array.keepMap(isNew)
-    ->Belt.Array.map(((applicableLaw, nextStatement)) => {
-        let thisHistory = recordHistory(statement, abstraction, applicableLaw, nextStatement, history)
-        (nextStatement, thisHistory)
-    })
-}
-
-let next = (statement: Ast.proposition, history: solutionHistory) : solutionWithHistoryArr  => {
-    let abstractions = Abstraction.getAbstractions(statement)
-    let laws = abstractions->Belt.Array.flatMap(applyLawsToAbstraction(_, statement, history))
-
-
-
-    laws
-}
-
-let initializeHistory = statement =>[(Initial, statement)]
-
-let shouldShortCircuit = (nextResults) => {
+let containsSolution = neighbors => {
     // if there aere
-    let containsOptimal = nextResults
-    ->Belt.Array.map(((a, _)) => a)
+    let containsOptimal = neighbors
+    ->Belt.Array.map(((statement, _)) => statement)
     ->Belt.Array.keep(Heuristic.isOptimalSolution)
     ->Belt.Array.length
     ->(l => l > 0)
 
-    let shortCircuit =  (Belt.Array.length(nextResults) === 0) || containsOptimal
+    let shortCircuit =  (Belt.Array.length(neighbors) === 0) || containsOptimal
     shortCircuit
 }
 
-let solve = (statement: Ast.proposition) : solutionWithHistory => {
 
-    let chainIntoNext = arr => Belt.Array.flatMap(arr, ((statement, history)) => next(statement, history))
+let solve = (statement: Ast.proposition) : PropositionSearchDomain.solutionWithSteps => {
 
-    let rec invokeNextAndIterate = (i, previousIteratorResultsOpt) => {
-        let previousIteratorResults = Belt.Option.getWithDefault(previousIteratorResultsOpt, [])
 
-        let nextResults = switch previousIteratorResultsOpt {
-        | None => next(statement, initializeHistory(statement))
-        | Some(_) => chainIntoNext(previousIteratorResults)
+    let rec invokeNextAndIterate = (i, solutions) => {
+
+        let neighbors = switch solutions {
+        | None => PropositionSearchDomain.neighbors(statement)
+        | Some(arr) => PropositionSearchDomain.neighborsForMany(arr)
         }
 
-        let n =  shouldShortCircuit(nextResults) ? 0 : i - 1
+        let n = (containsSolution(neighbors)) ? 0 : i - 1
 
-        let aggregateResults =
-        nextResults
-        //->Belt.SortArray.stableSortBy(((a, _), (b, _)) => Heuristic.compare(a, b))
-        ->Belt.Array.concat(previousIteratorResults)
-
-
-        iterate(n, Some(aggregateResults))
+        iterate(n, Some(neighbors))
     }
-    and iterate = (i, previousIteratorResultsOpt) => {
-        switch (previousIteratorResultsOpt, i)  {
-        | (None, 0) => Some([(statement, initializeHistory(statement))])
-        | (Some(_), 0) => previousIteratorResultsOpt
-        | (None | Some(_), _) => invokeNextAndIterate(i, previousIteratorResultsOpt)
+    and iterate = (i, solutions) => {
+        switch (i, solutions)  {
+        | (0, None) => PropositionSearchDomain.makeSolutionArray(statement)->Some
+        | (0, Some(_)) => solutions
+        | (_, None | Some(_)) => invokeNextAndIterate(i, solutions)
         }
     }
 
-    iterate(numberOfIterations, None)
+    iterate(numberOfIterations, PropositionSearchDomain.makeSolutionArray(statement)->Some)
     ->Belt.Option.getExn
     // eliminate any solutions that are still abstractions
-    ->Belt.Array.keepMap(((statement, history)) => switch Ast.hasAbstraction(statement) {
-    | true => None
-    | false => Some((statement, history))
-    })
-    ->Belt.Array.map(((statement, history)) => (Heuristic.variablesRaisedToOperations(statement), statement, history))
-    ->Belt.SortArray.stableSortBy(((scA, _, _), (scB, _, _)) => Belt.Float.toInt(scA -. scB))
+//    ->Belt.Array.keepMap(((statement, history)) => switch Ast.hasAbstraction(statement) {
+//    | true => None
+//    | false => Some((statement, history))
+//    })
+    // score each last remaining neighbor, pick the best, drop the scoring
+    ->Belt.Array.map(((statement, history)) => (Heuristic.variablesRaisedToOperations(statement), (statement, history)))
+    ->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => Belt.Float.toInt(scA -. scB))
     ->(arr => arr[0])
-    ->((_, solution, history)) => (solution, history)
+    ->((_, solution)) => solution
 }

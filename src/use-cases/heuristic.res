@@ -33,8 +33,14 @@ let isOptimalSolution = (node) => {
     let numVars = countVariables(node)
 
     switch (numUnary, numBinary, numVars) {
+    // one unary operation with a single variable "not(a)"
     | (1,0,1) => true
+    // one binary operation with two variables "a and b"
     | (0, 1, 2) => true
+    // no operations, no variables "T"
+    | (0, 0, 0) => true
+    // no operations, one variable "a"
+    | (0, 0, 1) => true
     | _ => false
     }
 }
