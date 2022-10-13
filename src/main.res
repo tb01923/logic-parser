@@ -82,19 +82,17 @@ let abstract = ast =>
 //"a and b and c"
 //"not(a) and a"
 //"not(q) or p"
-"(not(a and b) and not(a and b) or (a and b)) or F"
+//"(not(a and b) and not(a and b) or (a and b)) or F"
 //"(not(a and b) or not(a and b) or (a and b))"
 //"a and b or not(a and b)"
-//"a and a and a and a and a"
+"a and a and a and a and a"
 //"p or q and p"
 ->Parser.parse
 ->solve
 
 
-/*
-     (a and b) and not(a and b)
-
-     c and not c
-     c and d
-     e
-*/
+//let a = Parser.parse("not(a and b)")
+//let b = Parser.parse("not(a) or not(b) or T")
+//
+//let d = Heuristic.levenshteinProposition(a, b)
+//Js.Console.log(d)
