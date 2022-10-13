@@ -55,8 +55,6 @@ let attemptMatch = (statement, law) => {
 
 let rec identifyLaws = statement => {
 
-//    let t = StringRepresentation.printImplicit(statement)
-
     let theseMatches = laws
         -> Belt.Array.keepMap(attemptMatch(statement))
         -> Belt.Array.concatMany

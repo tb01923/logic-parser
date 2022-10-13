@@ -1,38 +1,35 @@
 
 
-let getLabel = tag => switch tag {
-    | BruteForceSolver.AbstractionStep => "abstraction"
-    | BruteForceSolver.ApplicationStep({ matchedLaw, _, _ }) => {
-        let (name, _, _) = matchedLaw
-        name
+let extractLabelAndProposition = tag => switch tag {
+    | PropositionSearchDomain.AbstractionStep(x) => ("abstraction", x)
+    | PropositionSearchDomain.ApplicationStep({ matchedLaw, _, _ }) => {
+        let (name, x, _) = matchedLaw
+        (name, x)
     }
-    | TransformationResult => "transformation"
-    | Initial => "initial"
-    | Trace (s) => s
+    | PropositionSearchDomain.TransformationResult(x) => ("transformation", x)
+    | PropositionSearchDomain.Initial(x) => ("initial", x)
+    | PropositionSearchDomain.Trace(str, x) => (str, x)
 }
 
-let print = (step, x) => {
-    let score = Heuristic.variablesRaisedToOperations(x)
-    let l = getLabel(step)
+let printStep = (step) => {
+    let (l, statement) = extractLabelAndProposition(step)
+    let score = Heuristic.variablesRaisedToOperations(statement)
+
     let tabs = switch Js.String2.length(l) {
     | x if x < 6 => "\t\t\t\t"
     | x if x < 15 => "\t\t\t"
-    | x if x < 16 => "\t\t"
+    | x if x < 18 => "\t\t"
     | _ => "\t"
     }
-    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(x))
+    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(statement))
 }
 
 let solve = ast =>
     ast
-    ->(ast => {
-        StringRepresentation.printImplicit(ast)->Js.Console.log
-        Js.Console.log("_________")
-        ast
-    })
-    ->BruteForceSolver.solve
+//    ->BruteForceSolver.solve
+    ->BeamSearchSolver.solve
     ->((_, history)) => history
-    ->Belt.Array.map(((step, statement)) => print(step, statement))
+    ->Belt.Array.map(printStep)
     ->ignore
 
 let abstract = ast =>
@@ -82,9 +79,10 @@ let abstract = ast =>
     ->ignore
 
 
+//"a and b and c"
 //"not(a) and a"
-"not(q) or p"
-//"(not(a and b) and not(a and b) or (a and b)) or F"
+//"not(q) or p"
+"(not(a and b) and not(a and b) or (a and b)) or F"
 //"(not(a and b) or not(a and b) or (a and b))"
 //"a and b or not(a and b)"
 //"a and a and a and a and a"
