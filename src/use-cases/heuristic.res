@@ -1,5 +1,6 @@
 open Ast
 open Debruinj
+open VectorRepresentation
 
 let accumulateMapReducer = (acc, _, _) => acc + 1
 let countItems = Belt.HashMap.String.reduce(_, 0, accumulateMapReducer)
@@ -65,4 +66,53 @@ let variablesRaisedToOperations = node => {
 
 let compare = (a, b) => {
     (variablesRaisedToOperations(b) -. variablesRaisedToOperations(a))->Belt.Float.toInt
+}
+
+
+let minimum = (a, b, c) => {
+    if a < b && a < c {
+        a
+    }
+    else if b < a && b < c {
+        b
+    }
+    else {
+        c
+    }
+}
+/*
+lDistance :: Eq a => [a] -> [a] -> Int
+lDistance [] t = length t -- If s is empty, the distance is the number of characters in t
+lDistance s [] = length s -- If t is empty, the distance is the number of characters in s
+lDistance (a : s') (b : t') =
+  if a == b
+    then lDistance s' t' -- If the first characters are the same, they can be ignored
+    else
+      1
+        + minimum -- Otherwise try all three possible actions and select the best one
+          [ lDistance (a : s') t', -- Character is inserted (b inserted)
+            lDistance s' (b : t'), -- Character is deleted  (a deleted)
+            lDistance s' t' -- Character is replaced (a replaced with b)
+          ]
+*/
+
+let rec levenshtein = (s, t) =>  switch(s, t) {
+| (list{}, t) => Belt.List.length(t)
+| (s, list{}) => Belt.List.length(s)
+| (list{a, ...ss}, list{b, ...ts}) if a == b => levenshtein(ss, ts)
+| (list{_, ...ss}, list{_, ...ts}) => {
+    1 + minimum(
+        // lDistance (a : s') t'    (in this case algo reforms s by append a to s' (or ss), we can just refer to s)
+        levenshtein(s, ts),
+        // lDistance s' (b : t')    (in this case algo reforms t by append b to t' (or ts), we can just refer to t)
+        levenshtein(ss, t),
+        // lDistance s' t'
+        levenshtein(ss, ts)
+    )
+}}
+
+let levenshteinProposition  = (a: proposition, b: proposition) => {
+    let va = toVector(a)
+    let vb = toVector(b)
+    levenshtein(va, vb)
 }
