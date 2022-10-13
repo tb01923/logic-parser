@@ -30,6 +30,9 @@ let isUnseenNeighbor = (solution) => {
 
 
 let applyLawsToAbstraction = (abstraction, stepsFromOrigin:solutionSteps) => {
+//    let s = Heuristic.variablesRaisedToOperations(abstraction)->Belt.Float.toString
+//    Js.Console.log("\t" ++ s ++ "\t\t" ++ StringRepresentation.printImplicit(abstraction))
+
     abstraction
     ->LawApplication.identifyLaws
     ->Belt.Array.map(applicableLaw => {
@@ -49,9 +52,22 @@ let applyLawsToAbstraction = (abstraction, stepsFromOrigin:solutionSteps) => {
     })
 }
 
+let orderAbstractions = abstractions =>{
+    let xs = Belt.Array.sliceToEnd(abstractions, 1)
+    let x = abstractions[0]
+    Belt.Array.push(xs, x)
+    xs
+}
+
 let neighbors = (~steps=[], statement: Ast.proposition) : solutionArray  => {
+
+//    let s = Heuristic.variablesRaisedToOperations(statement)->Belt.Float.toString
+//    Js.Console.log(s ++ "\t\t" ++ StringRepresentation.printImplicit(statement))
+
+
     statement
     ->Abstraction.getAbstractions
+    ->orderAbstractions
     ->Belt.Array.flatMap(applyLawsToAbstraction(_, steps))
     ->Belt.Array.keepMap(isUnseenNeighbor)
 }

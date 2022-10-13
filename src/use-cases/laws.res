@@ -47,6 +47,8 @@ let laws = [
     makeLaw("Identity<and>", "p or T = p", ~bidirectional=false),
     makeLaw("Idempotence<or>", "p or p = p", ~bidirectional=false),
     makeLaw("Idempotence<and>", "p and p = p", ~bidirectional=false),
+    makeLaw("Tautology<bi>", "p <=> p = p", ~bidirectional=false),
+    makeLaw("Tautology<imp>", "p -> p = T", ~bidirectional=false),
     makeLaw("Double Negation", "not not p = p", ~bidirectional=false),
     makeLaw("Absorbtion<or>", "p or (p and q) = p", ~bidirectional=false),
     makeLaw("Absorbtion<and>", "p and (p or q) = p", ~bidirectional=false),
