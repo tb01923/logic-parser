@@ -10,13 +10,27 @@ let containsSolution = neighbors => {
     shortCircuit
 }
 
-let bestN = (neighbors, n) => {
+let takeBest = (neighbors, n) => {
     let numNeighbors = Belt.Array.length(neighbors)
     neighbors
     // score each neighbor
-    ->Belt.Array.map(((statement, history)) => (Heuristic.variablesRaisedToOperations(statement), (statement, history)))
+    ->Belt.Array.map(((statement, history)) => (Heuristic.complexity(statement), (statement, history)))
     // sort by score
-    ->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => Belt.Float.toInt(scA -. scB))
+    //->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => Belt.Float.toInt(scA -. scB))
+    ->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => scA - scB)
+    // pick best
+    ->arr => Belt.Array.slice(arr, ~offset=0, ~len=(n < numNeighbors ? n : numNeighbors))
+    // disca
+    ->Belt.Array.map(((_, solution)) => solution)
+}
+
+let takeClosest = (neighbors, original, n) => {
+    let numNeighbors = Belt.Array.length(neighbors)
+    neighbors
+    // score each neighbor
+    ->Belt.Array.map(((statement, history)) => (Heuristic.levenshteinProposition(original, statement), (statement, history)))
+    // sort by score
+    ->Belt.SortArray.stableSortBy(((scA, _), (scB, _)) => scA - scB)
     // pick best
     ->arr => Belt.Array.slice(arr, ~offset=0, ~len=(n < numNeighbors ? n : numNeighbors))
     // disca

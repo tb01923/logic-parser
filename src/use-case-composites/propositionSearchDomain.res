@@ -64,6 +64,15 @@ let neighbors = (~steps=[], statement: Ast.proposition) : solutionArray  => {
 //    let s = Heuristic.variablesRaisedToOperations(statement)->Belt.Float.toString
 //    Js.Console.log(s ++ "\t\t" ++ StringRepresentation.printImplicit(statement))
 
+//    Js.Console.log(StringRepresentation.printImplicit(statement))
+//    Js.Console.log("________________________________________")
+//    statement
+//    ->Abstraction.getAbstractions
+//    ->Belt.Array.map((a) =>
+//        Heuristic.complexity(a)->Belt.Int.toString ++ " :" ++
+//            StringRepresentation.printImplicit(a))
+//    ->Js.Console.log
+//    Js.Console.log("^^")
 
     statement
     ->Abstraction.getAbstractions

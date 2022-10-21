@@ -18,6 +18,6 @@ let solve = (statement) : PropositionSearchDomain.solutionWithSteps => {
 
     PropositionSearchDomain.makeSolutionArray(statement)
     ->iterate(numberOfIterations, _)
-    ->bestN(1)
+    ->takeBest(1)
     ->(arr => arr[0])
 }
