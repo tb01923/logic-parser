@@ -59,7 +59,7 @@ let applyAbstraction = (agg, abstraction) => {
 
 let getAbstractions = (statement) => {
   let second = ((_, b)) => b
-  let sortByComplexity = ((scoreA, _), (scoreB, _)) => Belt.Float.toInt(scoreA -. scoreB)
+  let sortByComplexity = ((scoreA, _), (scoreB, _)) => scoreA - scoreB
   let knownSymbols = getDebruinjIndices(statement)
 
   statement

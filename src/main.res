@@ -13,7 +13,7 @@ let extractLabelAndProposition = tag => switch tag {
 
 let printStep = (step) => {
     let (l, statement) = extractLabelAndProposition(step)
-    let score = Heuristic.variablesRaisedToOperations(statement)
+    let score = Heuristic.complexity(statement)
 
     let tabs = switch Js.String2.length(l) {
     | x if x < 6 => "\t\t\t\t"
@@ -21,7 +21,7 @@ let printStep = (step) => {
     | x if x < 18 => "\t\t"
     | _ => "\t"
     }
-    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Float.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(statement))
+    Js.Console.log(l ++ ":" ++ tabs ++ Belt.Int.toString(score) ++ "\t" ++  StringRepresentation.printImplicit(statement))
 }
 
 let solve = ast =>
@@ -32,48 +32,42 @@ let solve = ast =>
     ->Belt.Array.map(printStep)
     ->ignore
 
+open LawApplication
 let abstract = ast =>
-    ast
-    ->Abstraction.getAbstractions
-    ->Belt.Array.getExn(4)
-    ->abstraction => {
-        Js.Console.log("")
-        Js.Console.log("Abstraction")
-        Js.Console.log("")
-        abstraction
-        ->StringRepresentation.printImplicit
-        ->Js.Console.log
 
-        Js.Console.log("")
-        Js.Console.log("Laws")
-        Js.Console.log("")
+        ast
+        ->Abstraction.getAbstractions
+        ->Belt.Array.map(abstraction => {
+            abstraction
+            ->(a => "A " ++ StringRepresentation.printImplicit(a))
+            ->Js.Console.log
 
-        abstraction
-    }
-    ->LawApplication.identifyLaws
-    ->Belt.Array.map((trans) => {
-        let {matchedLaw} = trans
+            abstraction
+        })
+        ->Belt.Array.flatMap(LawApplication.identifyLaws)
+        ->Belt.Array.map((trans: LawApplication.transformation) => {
+            let {matchedLaw} = trans
 
-        LawApplication.getLawAst(matchedLaw)
-        ->StringRepresentation.printImplicit
-        ->Js.Console.log
+            LawApplication.getLawAst(matchedLaw)
+            ->(l => "L " ++ StringRepresentation.printImplicit(l))
+            ->Js.Console.log
 
-        trans
-    })
-    ->Belt.Array.getExn(0)
-    ->(trans: LawApplication.transformation ) => {
+            trans
+        })
+        ->Belt.Array.map((trans: LawApplication.transformation ) => {
 
-        let {matchedLaw, statementMatched, matchedSide} = trans
-        let nextStatement = Replacement.replace(
-            abstraction,
-            statementMatched,
-            LawApplication.getLawAst(matchedLaw),
-            matchedSide)
+            let {matchedLaw, statementMatched, matchedSide} = trans
+            let nextStatement = Replacement.replace(
+                ast,
+                statementMatched,
+                LawApplication.getLawAst(matchedLaw),
+                matchedSide)
 
-        nextStatement
-        ->StringRepresentation.printImplicit
-        ->Js.Console.log
-    }
+            nextStatement
+            ->(n => "N " ++ StringRepresentation.printImplicit(n))
+            ->Js.Console.log
+        })
+
 //    ->Belt.Array.map(StringRepresentation.printImplicit)
 //    ->Belt.Array.map(Js.Console.log)
     ->ignore
@@ -84,8 +78,8 @@ let abstract = ast =>
 //"not(q) or p"
 //"(not(a and b) and not(a and b) or (a and b)) or F"
 //"(not(a and b) or not(a and b) or (a and b))"
-//"a and b or not(a and b)"
-"a and a and a and a and a"
+"a and b or not(a and b)"
+//"a and a and a and a and a"
 //"p or q and p"
 ->Parser.parse
 ->solve

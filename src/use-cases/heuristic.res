@@ -17,7 +17,7 @@ let rec countUnary = (acc, node) => switch node {
 | _ => acc
 }
 
-let countVariables = (node) =>
+let countUniqueVariables = (node) =>
     node
     -> getDebruinjIndices
     -> countItems
@@ -28,10 +28,17 @@ let rec countOperations = (acc, node) => switch node {
 | _ => acc
 }
 
+let rec countVariables = (acc, node) => switch node {
+| BinaryOperation(_, _, lhs, rhs) => acc + countVariables(0, lhs) + countVariables(0, rhs)
+| UnaryOperation(_, _, term) => acc + countVariables(0, term)
+| Variable(_, _) => acc + 1
+| _ => acc
+}
+
 let isOptimalSolution = (node) => {
     let numUnary = countUnary(0, node)
     let numBinary = countBinary(0, node)
-    let numVars = countVariables(node)
+    let numVars = countUniqueVariables(node)
 
     switch (numUnary, numBinary, numVars) {
     // one unary operation with a single variable "not(a)"
@@ -60,13 +67,19 @@ let variablesRaisedToOperations = node => {
     }
 
     Js.Math.pow_float(
-        ~base=(countVariables(node) + binaryOpBump)->Belt.Int.toFloat,
-        ~exp=countOperations(0, node)->Belt.Int.toFloat)
+        ~base=(countUniqueVariables(node) + binaryOpBump)->Belt.Int.toFloat,
+        ~exp=countOperations(0, node)->Belt.Int.toFloat)->Belt.Float.toInt
 }
 
-let compare = (a, b) => {
-    (variablesRaisedToOperations(b) -. variablesRaisedToOperations(a))->Belt.Float.toInt
+let complexity2 = (node) => {
+    let u = countUniqueVariables(node)
+    let o = countOperations(0, node)
+    let v = countVariables(0, node)
+
+    v + u  + o
 }
+
+let complexity = complexity2
 
 
 let minimum = (a, b, c) => {

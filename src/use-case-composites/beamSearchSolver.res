@@ -7,7 +7,13 @@ let solve = (statement) : PropositionSearchDomain.solutionWithSteps => {
             solutions
             ->PropositionSearchDomain.neighborsForMany
             ->removeAbstractions
-            ->bestN(5)
+            ->takeBest(5)
+
+//        Js.Console.log(".........")
+//        Js.Console.log(Belt.Array.map(solutions, ((s, _)) => StringRepresentation.printImplicit(s)))
+//        Js.Console.log(Belt.Array.map(neighbors, ((s, _)) =>
+//            Heuristic.complexity(s)->Belt.Int.toString ++ " :" ++
+//            StringRepresentation.printImplicit(s)))
 
         let currentSet =
             neighbors
@@ -26,6 +32,6 @@ let solve = (statement) : PropositionSearchDomain.solutionWithSteps => {
 
     PropositionSearchDomain.makeSolutionArray(statement)
     ->iterate
-    ->bestN(1)
+    ->takeBest(1)
     ->(arr => arr[0])
 }
