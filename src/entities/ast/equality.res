@@ -73,7 +73,7 @@ let rec byAbstractionResolution = (astA, astB) =>
     | (_, _) => byName(astA, astB)
     }
 
-module PropositionCompare= Belt.Id.MakeComparable({
+module PropositionCompare = Belt.Id.MakeComparable({
   type t = proposition
   let cmp = (a, b) => switch byName(a, b) {
   | true => 0
