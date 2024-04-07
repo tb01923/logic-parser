@@ -10,14 +10,14 @@ This is a simple example that reduces in one step: `a and b or not(a and b)` thi
 as true `⊤`.  There are infinite variants of this propositional equation including more complex 
 (`(a and b and c) or not(a and b and c)`) and simpler (`a or not a`).  Execution of these statements are correctly 
 reduced to `⊤`, and the output shows the path to get there:
-
+```
 Step                        Complexity   Representation
 --------------------------  ----------   -----------------------------
 initial:                    10           ((a ∧ b) ∨ ¬(a ∧ b))
 abstraction:                5            ([c/(a ∧ b)] ∨ ¬[c/(a ∧ b)])
 Complement<or>:             6            ((p ∨ ¬p) ≡ ⊤)
 transformation:             0            ⊤
-
+```
 The reduction engine takes the following steps:
 1. parses the input into the abstract syntax tree with implicit grouping of `a and b` added
 2. forms all possible abstract representations of the statement at this step (including keeping the intial version)
@@ -29,14 +29,14 @@ The reduction engine takes the following steps:
 5. since the complexity is 0 there are no possible remaining reductions so it is done.
 
 The slightly more complex version of `a and b and c or not(a and b and c)` has a similar tree:
-
+```
 Step                        Complexity   Representation
 --------------------------  ----------   -----------------------------
 initial:                    15           ((a ∧ (b ∧ c)) ∨ ¬(a ∧ (b ∧ c)))
 abstraction:                6            ([e/(a ∧ (b ∧ c))] ∨ ¬[e/(a ∧ (b ∧ c))])
 Complement<or>:             6            ((p ∨ ¬p) ≡ ⊤)
 transformation:             0            ⊤
-
+```
 a slight difference is that the reduction engine abstracted the `a and b and c` to the variable `e` which indicates
 that it found another abstraction that it would have labeled as `d`  as less important.  in this case 
 (based on where the parens are) it was the statement `b and c`. The path to an optimal solution didn't leverage 
