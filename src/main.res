@@ -26,8 +26,8 @@ let printStep = (step) => {
 
 let solve = ast =>
     ast
-//    ->BruteForceSolver.solve
-    ->BeamSearchSolver.solve
+   ->BruteForceSolver.solve
+    // ->BeamSearchSolver.solve
     ->((_, history)) => history
     ->Belt.Array.map(printStep)
     ->ignore
@@ -73,12 +73,12 @@ let abstract = ast =>
     ->ignore
 
 
-//"a and b and c"
-//"not(a) and a"
+// "a and b and c"
+// "not(a) and a"
 //"not(q) or p"
 //"(not(a and b) and not(a and b) or (a and b)) or F"
 //"(not(a and b) or not(a and b) or (a and b))"
-"a and b or not(a and b)"
+"a and b and c or not(a and b and c)"
 //"a and a and a and a and a"
 //"p or q and p"
 ->Parser.parse

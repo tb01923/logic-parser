@@ -10,13 +10,16 @@ let accumulateInvertedMap = (hashmap, invertedMap, key) => {
     invertedMap
  }
 
-let invertHashMap = hashmap =>
+let invertHashMap = hashmap => {
+    let accumulateInvertedMapReducer = (agg, x) => accumulateInvertedMap(hashmap, agg, x)
+
     hashmap
         // get an array of keys
         ->Belt.HashMap.String.keysToArray
         ->Belt.Array.reduce(
             Belt.HashMap.Int.make(~hintSize=10),
-            accumulateInvertedMap(hashmap))
+            accumulateInvertedMapReducer)
+}
 
 let cloneVariable = (name, equationAlphabet, targetAlphabet) => {
     // invert the hashmap to key by the index, and have value be the variable name

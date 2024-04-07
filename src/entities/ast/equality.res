@@ -13,7 +13,7 @@ let unOpEquals = (opA, opB) => switch (opA, opB) {
 | (Negation, Negation) => true
 }
 
-let equals = (symbolEquals) => {
+let equalsWith = (symbolEquals) => {
 
     let rec equals = (astA, astB) => switch (astA, astB) {
     | (Value(_, a), Value(_, b)) => a === b
@@ -51,12 +51,14 @@ let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
         let bi = Belt.HashMap.String.get(ctxB, b)
         ai === bi
     }
-    equals(variableIndexEquals, stmtA, stmtB)
+    let equalsWithVariableIndexEquals = equalsWith(variableIndexEquals)
+    equalsWithVariableIndexEquals(stmtA, stmtB)
 }
 
 let byName = (stmtA, stmtB) => {
     let nameEquals = (a, b) => a === b
-    equals(nameEquals, stmtA, stmtB)
+    let equalsWithNameEquals = equalsWith(nameEquals)
+    equalsWithNameEquals(stmtA, stmtB)
 }
 
 let rec byAbstractionResolution = (astA, astB) =>
@@ -73,7 +75,7 @@ let rec byAbstractionResolution = (astA, astB) =>
     | (_, _) => byName(astA, astB)
     }
 
-module PropositionCompare= Belt.Id.MakeComparable({
+module PropositionCompare= Belt.Id.MakeComparableU({
   type t = proposition
   let cmp = (a, b) => switch byName(a, b) {
   | true => 0

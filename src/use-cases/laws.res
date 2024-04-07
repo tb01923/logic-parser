@@ -8,15 +8,21 @@ exception ExpectingEquivalence(string)
 
 type law = (string, Ast.proposition, bool)
 
-let makeLaw = (~bidirectional=true, name, lawString) => {
-    let ast = Parser.parse(lawString)
-    switch ast {
-    | BinaryOperation(_, op, _, _) => switch op {
-        | Equivalence => (name, ast, bidirectional)
-        | _ => raise(ExpectingEquivalence(lawString))
+/**
+    create a law through conver a propositional statement to an AST and 
+        ensuring it is an Equivallence Binary Operation 
+
+*/
+let makeLaw = (~bidirectional=true, name, propositionString) => {
+  let ast = Parser.parse(propositionString)
+  switch ast {
+  | BinaryOperation(_, op, _, _) =>
+    switch op {
+    | Equivalence => (name, ast, bidirectional)
+    | _ => raise(ExpectingEquivalence(propositionString))
     }
-    | _ => raise(ExpectingEquivalence(lawString))
-    }
+  | _ => raise(ExpectingEquivalence(propositionString))
+  }
 }
 
 let laws = [

@@ -31,9 +31,9 @@ let attemptMatch = (statement, law) => {
     // two partial applications
     //  1. ctx for lhs/rhs of law is derived from entire law (keep debruinj index consistent on both sides)
     //  2. statement applied to simplify reading the switch
-    let equals = equals(~bCtxSrc=ast, statement)
+    let equalsStatement = statementB => equals(~bCtxSrc=ast, statement, statementB)
 
-    let equivalenceMatch = (lhs, rhs) => switch (bidirectional, equals(lhs), equals(rhs)) {
+    let equivalenceMatch = (lhs, rhs) => switch (bidirectional, equalsStatement(lhs), equalsStatement(rhs)) {
     // both sides of the law are matches, and law is applied bidirectionally
     | (true, true, true) => Some([
        makeTransformation(law, LHS, statement), makeTransformation(law, RHS, statement) ])
@@ -55,8 +55,9 @@ let attemptMatch = (statement, law) => {
 
 let rec identifyLaws = statement => {
 
+    let attemptToMatchLaw = law => attemptMatch(statement, law)
     let theseMatches = laws
-        -> Belt.Array.keepMap(attemptMatch(statement))
+        -> Belt.Array.keepMap(attemptToMatchLaw)
         -> Belt.Array.concatMany
 
     let subMatches = switch statement {
@@ -67,3 +68,4 @@ let rec identifyLaws = statement => {
 
     Belt.Array.concat(theseMatches, subMatches)
 }
+

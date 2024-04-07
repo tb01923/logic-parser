@@ -29,7 +29,7 @@ let abstractOperation = (knownSymbols, operation) => {
 }
 
 let rec performAbstraction = (statement, abstraction) => {
-    let abstractEquals = Equality.byAbstractionResolution(abstraction)
+    let abstractEquals = (rhs) => Equality.byAbstractionResolution(abstraction, rhs)
     switch (statement) {
     | BinaryOperation(_) if abstractEquals(statement) => abstraction
     | BinaryOperation(_, op, lhs, rhs) => makeBinaryOperation(
@@ -72,7 +72,7 @@ let getAbstractions = (statement) => {
   -> Belt.Set.fromArray(~id=module(Equality.PropositionCompare))
   -> Belt.Set.toArray
   // box each Operation within an Abstraction
-  -> Belt.Array.map(abstractOperation(knownSymbols))
+  -> Belt.Array.map(operation => abstractOperation(knownSymbols, operation))
   // Replace Operations with corresponding Abstraction, resulting in an incremental variants of the
   //    original statement.  S0 is most specfic form, S1 has Abstraction1 applied, S2 has abstraction1 & 2 applied...
   -> Belt.Array.reduce([statement], applyAbstraction)
