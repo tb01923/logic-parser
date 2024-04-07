@@ -72,21 +72,36 @@ let abstract = ast =>
 //    ->Belt.Array.map(Js.Console.log)
     ->ignore
 
+let solve = () => 
+    // "a and b and c"
+    // "not(a) and a"
+    //"not(q) or p"
+    //"(not(a and b) and not(a and b) or (a and b)) or F"
+    //"(not(a and b) or not(a and b) or (a and b))"
+    "a and b and c or not(a and b and c)"
+    //"a and a and a and a and a"
+    //"p or q and p"
+    ->Parser.parse
+    ->solve
+    ->ignore
 
-// "a and b and c"
-// "not(a) and a"
-//"not(q) or p"
-//"(not(a and b) and not(a and b) or (a and b)) or F"
-//"(not(a and b) or not(a and b) or (a and b))"
-"a and b and c or not(a and b and c)"
-//"a and a and a and a and a"
-//"p or q and p"
-->Parser.parse
-->solve
+let printLaws = () => {
+    // Laws.laws
+    //     ->Belt.Array.map(LawApplication.getLawAst)
+    //     ->Belt.Array.map(StringRepresentation.printImplicit)
+    //     ->Belt.Array.map(Js.Console.log)
+    //     ->ignore
 
+    let getName = (law:Laws.law) : string => {
+        let (name, _,  _) = law
+        name
+    } 
 
-//let a = Parser.parse("not(a and b)")
-//let b = Parser.parse("not(a) or not(b) or T")
-//
-//let d = Heuristic.levenshteinProposition(a, b)
-//Js.Console.log(d)
+    Laws.laws
+        ->Belt.Array.map(law  => (getName(law), LawApplication.getLawAst(law)))
+        ->Belt.Array.map(((name, ast)) => (name, StringRepresentation.printImplicit(ast)))
+        ->Belt.Array.map(((name, law)) => Js.Console.log(name ++ ": " ++ law))
+        ->ignore
+}
+
+printLaws()

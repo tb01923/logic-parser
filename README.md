@@ -45,6 +45,61 @@ that abstraction.
 Once less note on abstraction.  I adopted the notation for abstraction that is similar to that of substituion:
 `[c/(a ∧ b)]` to mean `c` stands for the proposition `a ∧ b` or more generally `[c/d]`c stands for the proposition `d`
 
+### Laws
+## truth table based laws (all booleans)
+```
+truth-table-and:            ((⊤ ∧ ⊤) ≡ ⊤)
+truth-table-and:            ((⊤ ∧ ⊥) ≡ ⊥)
+truth-table-and:            ((⊥ ∧ ⊤) ≡ ⊥)
+truth-table-and:            ((⊥ ∧ ⊥) ≡ ⊥)
+truth-table-or:             ((⊤ ∨ ⊤) ≡ ⊤)
+truth-table-or:             ((⊤ ∨ ⊥) ≡ ⊤)
+truth-table-or:             ((⊥ ∨ ⊤) ≡ ⊤)
+truth-table-or:             ((⊥ ∨ ⊥) ≡ ⊥)
+truth-table-implies:        ((⊤ -> ⊤) ≡ ⊤)
+truth-table-implies:        ((⊤ -> ⊥) ≡ ⊥)
+truth-table-implies:        ((⊥ -> ⊤) ≡ ⊤)
+truth-table-implies:        ((⊥ -> ⊥) ≡ ⊤)
+truth-table-biconditional:  ((⊤ <=> ⊤) ≡ ⊤)
+truth-table-biconditional:  ((⊤ <=> ⊥) ≡ ⊥)
+truth-table-biconditional:  ((⊥ <=> ⊤) ≡ ⊥)
+truth-table-biconditional:  ((⊥ <=> ⊥) ≡ ⊤)
+truth-table-negate:         (¬⊥ ≡ ⊤)
+truth-table-negate:         (¬⊤ ≡ ⊥)
+```
+## Laws that resolve to booleans
+```
+Domination<or>:             ((p ∨ ⊤) ≡ ⊤)
+Domination<and>:            ((p ∧ ⊥) ≡ ⊥)
+Tautology<imp>:             ((p -> p) ≡ ⊤)
+Complement<or>:             ((p ∨ ¬p) ≡ ⊤)
+Complement<and>:            ((p ∧ ¬p) ≡ ⊥)
+```
+## laws that resolve to a single variable
+```
+Identity<or>:               ((p ∨ ⊥) ≡ p)
+Identity<and>:              ((p ∨ ⊤) ≡ p)
+Idempotence<or>:            ((p ∨ p) ≡ p)
+Idempotence<and>:           ((p ∧ p) ≡ p)
+Tautology<bi>:              ((p <=> p) ≡ p)
+Double Negation:            (¬¬p ≡ p)
+Absorbtion<or>:             ((p ∨ (p ∧ q)) ≡ p)
+Absorbtion<and>:            ((p ∧ (p ∨ q)) ≡ p)
+```
+# laws that transform propositional statements to other forms
+```
+Commutative<and>: ((p ∧ q) ≡ (q ∧ p))
+Commutative<or>: ((p ∨ q) ≡ (q ∨ p))
+DeMorgan<not(or)>: (¬(p ∨ q) ≡ (¬p ∧ ¬q))
+DeMorgan<not(and)>: (¬(p ∧ q) ≡ (¬p ∨ ¬q))
+Associative<and>: (((p ∧ q) ∧ r) ≡ (p ∧ (q ∧ r)))
+Associative<or>: (((p ∨ q) ∨ r) ≡ (p ∨ (q ∨ r)))
+Distributive<or(and)>: ((p ∨ (q ∧ r)) ≡ ((p ∨ q) ∧ (p ∨ r)))
+Distributive<and(or)>: ((p ∧ (q ∨ r)) ≡ ((p ∧ q) ∨ (p ∧ r)))
+biconditional equivalence: (((p ∧ q) ∨ (¬p ∧ ¬q)) ≡ (p <=> q))
+implication equivalence: ((p ∨ ¬q) ≡ (p -> q))
+```
+
 ### ReScript version
 ```
 npm install
