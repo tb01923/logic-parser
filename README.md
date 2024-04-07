@@ -88,16 +88,16 @@ Absorbtion<and>:            ((p ∧ (p ∨ q)) ≡ p)
 ```
 # laws that transform propositional statements to other forms
 ```
-Commutative<and>: ((p ∧ q) ≡ (q ∧ p))
-Commutative<or>: ((p ∨ q) ≡ (q ∨ p))
-DeMorgan<not(or)>: (¬(p ∨ q) ≡ (¬p ∧ ¬q))
-DeMorgan<not(and)>: (¬(p ∧ q) ≡ (¬p ∨ ¬q))
-Associative<and>: (((p ∧ q) ∧ r) ≡ (p ∧ (q ∧ r)))
-Associative<or>: (((p ∨ q) ∨ r) ≡ (p ∨ (q ∨ r)))
-Distributive<or(and)>: ((p ∨ (q ∧ r)) ≡ ((p ∨ q) ∧ (p ∨ r)))
-Distributive<and(or)>: ((p ∧ (q ∨ r)) ≡ ((p ∧ q) ∨ (p ∧ r)))
-biconditional equivalence: (((p ∧ q) ∨ (¬p ∧ ¬q)) ≡ (p <=> q))
-implication equivalence: ((p ∨ ¬q) ≡ (p -> q))
+Commutative<and>:           ((p ∧ q) ≡ (q ∧ p))
+Commutative<or>:            ((p ∨ q) ≡ (q ∨ p))
+DeMorgan<not(or)>:          (¬(p ∨ q) ≡ (¬p ∧ ¬q))
+DeMorgan<not(and)>:         (¬(p ∧ q) ≡ (¬p ∨ ¬q))
+Associative<and>:           (((p ∧ q) ∧ r) ≡ (p ∧ (q ∧ r)))
+Associative<or>:            (((p ∨ q) ∨ r) ≡ (p ∨ (q ∨ r)))
+Distributive<or(and)>:      ((p ∨ (q ∧ r)) ≡ ((p ∨ q) ∧ (p ∨ r)))
+Distributive<and(or)>:      ((p ∧ (q ∨ r)) ≡ ((p ∧ q) ∨ (p ∧ r)))
+biconditional equivalence:  (((p ∧ q) ∨ (¬p ∧ ¬q)) ≡ (p <=> q))
+implication equivalence:    ((p ∨ ¬q) ≡ (p -> q))
 ```
 
 ### ReScript version
