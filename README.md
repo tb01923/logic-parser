@@ -45,9 +45,6 @@ that abstraction.
 Once less note on abstraction.  I adopted the notation for abstraction that is similar to that of substituion:
 `[c/(a ∧ b)]` to mean `c` stands for the proposition `a ∧ b` or more generally `[c/d]`c stands for the proposition `d`
 
-
-
-
 ### ReScript version
 ```
 npm install
@@ -59,7 +56,10 @@ This will print something - but there is no REPL mode
 node src/main.bs.js
 ```
 
-todo:
-* modify identify laws to work over statements with abstractions
-* create a use case, to take a statement, generate all abstract variants, and generate all possible law matches for each variant
-* create "replace" capacity
+### todo
+* three variable laws do not work over statements with two variables
+  * `("Distributive<or(and)>`: `p or (q and r) = (p or q) and (p or r)")`
+  * should apply to `p or (p and q)` 
+* add tests
+* add REPL interaction
+* a BSAT solver: https://en.wikipedia.org/wiki/Boolean_satisfiability_problem
