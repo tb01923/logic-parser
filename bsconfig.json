@@ -20,5 +20,7 @@
     "rescript-uuid",
     "rescript-hash"
   ],
-  "bs-dev-dependencies": []
+  "bs-dev-dependencies": [
+    "rescript-test"
+  ]
 }

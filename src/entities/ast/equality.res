@@ -6,6 +6,7 @@ let binOpEquals = (opA, opB) => switch (opA, opB) {
 | (Disjunction, Disjunction) => true
 | (Conditional, Conditional) => true
 | (BiConditional, BiConditional) => true
+| (Equivalence, Equivalence) => true
 | (_, _) => false
 }
 

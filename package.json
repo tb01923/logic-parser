@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./node_modules/rescript-test/bin/retest.mjs ./tests/**/*.bs.js",
+    "start": "node ./src/main.bs.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "pegjs": "^0.10.0",
     "rescript": "^10.1.4",
     "rescript-hash": "^1.5.0",
+    "rescript-js": "^1.0.0-beta.2",
     "rescript-test": "^6.0.0",
     "rescript-uuid": "^8.3.2-alpha",
     "terminal-kit": "^2.11.5"
