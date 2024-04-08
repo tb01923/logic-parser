@@ -7,6 +7,7 @@ open Test
 // })
 
 test("/entities/ast/ast.res", () => {
+  // assemble AST by explicitly 
   let t = Ast.Value("", true)
   let f = Ast.Value("", false)
   let a = Ast.Variable("" ,"a")
@@ -19,6 +20,7 @@ test("/entities/ast/ast.res", () => {
   let aEquivA = Ast.BinaryOperation("", Ast.Equivalence, a, a)
   let abstractAandB = Ast.Abstraction("", "c", aAndB)
 
+  // test implicit constructors against explicit ASTs
   Assert.Ast.isEqualByName("Construct Variable: `a`", a, Ast.makeVariable("a"))
   Assert.Ast.isEqualByName("Construct Value: `true`", t, Ast.makeValue(true))
   Assert.Ast.isEqualByName("Construct Negation: `not(true)`", notT, Ast.makeNegation(Ast.makeValue(true)))
@@ -30,10 +32,10 @@ test("/entities/ast/ast.res", () => {
   Assert.Ast.isEqualByName("Construct BinaryOperation: `a == a`", aEquivA, Ast.makeEquivalence(a, a))
   Assert.Ast.isEqualByName("Construct Abstrtaction: `[c/(a and b)]`", abstractAandB, Ast.makeAbstraction("c", aAndB))
 
+  // test AST help methods
   Assert.Ast.isEqualByName("Get LHS", Ast.getLhs(aAndB), a)
   Assert.Ast.isEqualByName("Get RHS", Ast.getRhs(aAndB), b)
   Assert.Boolean.isTrue("Is Abstraction", Ast.hasAbstraction(abstractAandB))
-    
 })
 
 test("/entities/ast/parser", () => {
