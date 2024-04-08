@@ -6,7 +6,7 @@ open Test
 //   Assert.Demo.intEqual(~message="1 + 2 === 3", add(1, 2), 3)
 // })
 
-test("/entities/ast/constructors", () => {
+test("/entities/ast/ast.res", () => {
   let t = Ast.Value("", true)
   let f = Ast.Value("", false)
   let a = Ast.Variable("" ,"a")
@@ -29,6 +29,10 @@ test("/entities/ast/constructors", () => {
   Assert.Ast.isEqualByName("Construct BinaryOperation: `a <=> b`", aBiImplB, Ast.makeBiConditional(a, b))
   Assert.Ast.isEqualByName("Construct BinaryOperation: `a == a`", aEquivA, Ast.makeEquivalence(a, a))
   Assert.Ast.isEqualByName("Construct Abstrtaction: `[c/(a and b)]`", abstractAandB, Ast.makeAbstraction("c", aAndB))
+
+  Assert.Ast.isEqualByName("Get LHS", Ast.getLhs(aAndB), a)
+  Assert.Ast.isEqualByName("Get RHS", Ast.getRhs(aAndB), b)
+  Assert.Boolean.isTrue("Is Abstraction", Ast.hasAbstraction(abstractAandB))
     
 })
 
