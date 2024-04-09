@@ -13,6 +13,16 @@ module Boolean = {
 }
 
 module Ast = {
-   let isEqualByName = (message, a: Ast.proposition, b: Ast.proposition) =>
+  let isEqualByName = (message, a: Ast.proposition, b: Ast.proposition) =>
     assertion(~message=message, ~operator="Equality.byName", Equality.byName, a, b)
+}
+
+module Lexer = {
+  open Lexer
+  let isTokenEqual = (a: token, b: token) =>
+    assertion(~message="Tokens Equal <" ++ toString(a) ++"," ++ toString(b) ++ ">", 
+    ~operator="Lexer.isEqualtokenEquals", tokenEquals, a, b)
+  let isTokenNotEqual = (a: token, b: token) =>
+    assertion(~message="Tokens Not Equal <" ++ toString(a) ++"," ++ toString(b) ++ ">", 
+    ~operator="Lexer.isEqualtokenEquals", (a, b) => !tokenEquals(a, b), a, b)
 }

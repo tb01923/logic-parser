@@ -17,6 +17,20 @@ type token =
   | Truth
   | Falsity;
 
+let toString = (token) => switch (token) {
+  | LParen => "LParen"
+  | RParen => "RParen"
+  | Not => "Not"
+  | And => "And"
+  | Or => "Or"
+  | ThinRightArrow => "ThinRightArrow"
+  | FatDoubleArrow => "FatDoubleArrow"
+  | Equal => "Equal"
+  | Variable(a) => "Variable(" ++ a ++ ")"
+  | Truth => "Truth" 
+  | Falsity => "Falsity"
+}
+
 let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (Variable(a), Variable(b)) if a === b => true
     | (Variable(a), Variable(b)) if a !== b => false
