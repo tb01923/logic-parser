@@ -54,7 +54,7 @@ let replace = (originalStatement, statementToReplace, lawAst, matchedSide) => {
     let clonedLaw =
     lawAst
     ->extractApplicableSide
-    ->Clone.clone(~targetAlphabet=statementAlphabet, ~equationAlphabet=lawAlpha, _)
+    ->Clone.clone(~targetAlphabet=statementAlphabet, ~sourceAlphabet=lawAlpha, _)
     ->replaceAbstractionsInLaw(abstractionBySymbol)
 
     let idToReplace = getId(statementToReplace)

@@ -31,6 +31,12 @@ let toString = (token) => switch (token) {
   | Falsity => "Falsity"
 }
 
+let arrayToString = tokens => {
+  "[" ++ Belt.Array.reduce(
+    tokens, "", 
+    (str, t) => str ++ "," ++ toString(t)) ++ "]"
+}
+
 let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (Variable(a), Variable(b)) if a === b => true
     | (Variable(a), Variable(b)) if a !== b => false
