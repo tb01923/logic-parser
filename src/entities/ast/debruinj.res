@@ -27,9 +27,11 @@ let maxOptionals = (a, b) =>
     | (None, None) => Some(-1)
     }
 
-// getNextDebuinjIndex:
-//      given a hash map of known variables and their index positions, determine what the next index positin 
-//      should be. e.g., { 'a': 0, 'b': 1 } should return 1 and  { 'a': 0, 'b': 1, 'c': 2 } should return 3
+/**
+    getNextDebuinjIndex:
+        given a hash map of known variables and their index positions, determine what the next index positin 
+        should be. e.g., { 'a': 0, 'b': 1 } should return 1 and  { 'a': 0, 'b': 1, 'c': 2 } should return 3
+*/
 let getNextDebuinjIndex = knownVariables =>
     knownVariables
     // get the keys
@@ -43,19 +45,27 @@ let getNextDebuinjIndex = knownVariables =>
     // increment the prior max
     ->increment
 
-let addSymbolToIndices = (indices, name) => {
-    let id = (_, x) => x
-    switch Belt.HashMap.String.has(indices, name) {
+/**
+    addSymbolToIndices: add a symbol to the hashmpa of symbols and indexes by passing a name, finding the next index
+        adding it and returning the hashmap with the item added
+ */
+let addSymbolToIndices = (indices, name) => switch Belt.HashMap.String.has(indices, name) {
     | true => indices
-    | false => getNextDebuinjIndex(indices)->Belt.HashMap.String.set(indices, name, _)->id(indices)
+    | false => {
+        // get the next debruinj index by looking at the hashmap for the max value and incrementing
+        getNextDebuinjIndex(indices)
+        // set the value within the hashmap
+        ->Belt.HashMap.String.set(indices, name, _)
+        ->ignore
+        indices
     }
 }
 
 /**
-getNextSymbol: 
-     given a hashmap of variable names to index positions, determine what the next variable name will be
-     for instance  { 'a': 0, 'b': 1 } should return 'c' and  { 'a': 0, 'b': 1, 'c': 2 } should return 'd'
-     only works for single character variable names
+    getNextSymbol: 
+        given a hashmap of variable names to index positions, determine what the next variable name will be
+        for instance  { 'a': 0, 'b': 1 } should return 'c' and  { 'a': 0, 'b': 1, 'c': 2 } should return 'd'
+        only works for single character variable names
 */
 let getNextSymbol = indices => {
     let max = (a, b) =>
