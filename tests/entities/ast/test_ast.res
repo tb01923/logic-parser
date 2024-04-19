@@ -3,7 +3,6 @@ open Test
 test("/entities/ast/ast.res", () => {
   // assemble AST by explicitly 
   let t = Ast.Value("", true)
-  let f = Ast.Value("", false)
   let a = Ast.Variable("" ,"a")
   let b = Ast.Variable("" ,"b")
   let notT = Ast.UnaryOperation("", Ast.Negation, Ast.Value("", true))

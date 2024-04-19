@@ -31,6 +31,29 @@ module HashMapIntString = {
     assertion(~message=message, ~operator="Assert.HashMapIntString.hasmapEqualBySet", iEqualBySet, a, b)
 }
 
+module HashMapStringInt = {
+  module PairComparator = Belt.Id.MakeComparableU({
+        type t = (string, int)
+         let cmp = ((a0, a1), (b0, b1)) =>
+            switch Pervasives.compare(a0, b0) {
+            | 0 => Pervasives.compare(a1, b1)
+            | c => c
+            }
+    })
+    
+  let iEqualBySet = (a, b) => {
+    let arrA = Belt.HashMap.String.toArray(a)
+    let arrB = Belt.HashMap.String.toArray(b)
+    let setA = Belt.Set.fromArray(arrA, ~id=module(PairComparator))
+    let setB = Belt.Set.fromArray(arrB, ~id=module(PairComparator))
+
+    (setA == setB)
+  }
+
+  let isHashMapEqual = (message, a, b) =>
+    assertion(~message=message, ~operator="Assert.HashMapStringInt.hasmapEqualBySet", iEqualBySet, a, b)
+}
+
 module Parser = {
   let _throwsNoTokens = (f, _) => {
       try {

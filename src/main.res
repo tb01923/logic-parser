@@ -104,4 +104,4 @@ let printLaws = () => {
         ->ignore
 }
 
-printLaws()
+solve()
