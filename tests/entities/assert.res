@@ -7,6 +7,16 @@ module Boolean = {
     assertion(~message=message, ~operator="boolean is false", (a,b) => a == b, false, bool)
 }
 
+module Basics = {
+    let isStringEqual = (message, a, b) =>
+        assertion(~message=message, ~operator="Basics.isStringEqual", (a,b) => Js.String.localeCompare(a, b) == 0.0, a, b)
+
+    
+    let isIntEqual = (message, a, b) =>
+        assertion(~message=message, ~operator="Basics.isINtEqual", (a,b) => a == b, a, b)
+
+}
+
 
 module HashMapIntString = {
   module PairComparator = Belt.Id.MakeComparableU({

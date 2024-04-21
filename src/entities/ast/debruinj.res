@@ -46,7 +46,7 @@ let getNextDebuinjIndex = knownVariables =>
     ->increment
 
 /**
-    addSymbolToIndices: add a symbol to the hashmpa of symbols and indexes by passing a name, finding the next index
+    addSymbolToIndices: add a symbol to the hashmap of symbols and indexes by passing a name, finding the next index
         adding it and returning the hashmap with the item added
  */
 let addSymbolToIndices = (indices, name) => switch Belt.HashMap.String.has(indices, name) {
@@ -74,7 +74,7 @@ let getNextSymbol = indices => {
         | false => b
         }
 
-    let increment = x => Belt.Float.toInt(x) + 1
+    let increment = x => x + 1
 
     indices
     // look at the keys of the hasmap
@@ -82,7 +82,9 @@ let getNextSymbol = indices => {
     // find the max key
     ->Belt.Array.reduce("", max)
     // translate to the charcode (e.g., ascii value)
-    ->Js.String2.charCodeAt(0)
+    ->Js.String2.codePointAt(0)
+    ->Belt.Option.getWithDefault(96)
+    // ->(x) => { Js.Console.log2("x: ", x); x}
     // increment the value
     ->increment
     // convert it back to a character
