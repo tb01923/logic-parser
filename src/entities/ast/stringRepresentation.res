@@ -10,6 +10,16 @@ let variableDebruinjResolver = (name, context) => {
     }
 }
 
+
+let getBinOpName = operator => switch operator {
+        | Conjunction => "Conjunction"
+        | Disjunction => "Disjunction"
+        | Conditional => "Conditional"
+        | BiConditional => "BiConditional"
+        | Equivalence => "Equivalence"
+    }
+
+
 let implicitString = (symbolResolver, context, node) => {
 
     let getBinOpSymbol = operator => switch operator {
@@ -18,7 +28,7 @@ let implicitString = (symbolResolver, context, node) => {
         | Conditional => "->"
         | BiConditional => "<=>"
         | Equivalence => "≡"
-    }
+    }    
 
     let getUnOpSymbol = operator => switch operator {
         | Negation => "¬"

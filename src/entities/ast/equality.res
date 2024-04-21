@@ -7,7 +7,12 @@ let binOpEquals = (opA, opB) => switch (opA, opB) {
 | (Conditional, Conditional) => true
 | (BiConditional, BiConditional) => true
 | (Equivalence, Equivalence) => true
-| (_, _) => false
+// better than double wild card, if new operator is added, this prevents the app from compiling
+| (Conjunction, _) => false
+| (Disjunction, _) => false
+| (Conditional, _) => false
+| (BiConditional, _) => false
+| (Equivalence, _) => false
 }
 
 let unOpEquals = (opA, opB) => switch (opA, opB) {
