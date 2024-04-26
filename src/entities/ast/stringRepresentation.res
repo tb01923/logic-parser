@@ -19,6 +19,10 @@ let getBinOpName = operator => switch operator {
         | Equivalence => "Equivalence"
     }
 
+let getUnOpName = operator => switch operator {
+        | Negation => "Negation"
+    }
+
 
 let implicitString = (symbolResolver, context, node) => {
 

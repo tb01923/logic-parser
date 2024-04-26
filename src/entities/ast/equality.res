@@ -19,17 +19,22 @@ let unOpEquals = (opA, opB) => switch (opA, opB) {
 | (Negation, Negation) => true
 }
 
-let equalsWith = (symbolEquals) => {
+
+/**
+    equalsWith: return a function that compares two propositions and returns true if they are equal
+        though the @variableEquals coparrison of "named" (e.g., Variables, Abstractions) propositions  
+ */
+let equalsWith = (variableEquals) => {
 
     let rec equals = (astA, astB) => switch (astA, astB) {
     | (Value(_, a), Value(_, b)) => a === b
     | (UnaryOperation(_, opA, termA), UnaryOperation(_, opB, termB)) =>
         unOpEquals(opA, opB) && equals(termA, termB)
-    | (Variable(_, a), Variable(_, b)) => symbolEquals(a, b)
+    | (Variable(_, a), Variable(_, b)) => variableEquals(a, b)
     | (BinaryOperation(_, opA, lhsA, rhsA), BinaryOperation(_, opB, lhsB, rhsB)) =>
         binOpEquals(opA, opB) && equals(lhsA, lhsB) && equals(rhsA, rhsB)
     // todo: maybe throw an exception IF symbols are equals, but the propositions are not???
-    | (Abstraction(_, a, _), Abstraction(_, b, _)) => symbolEquals(a, b)
+    | (Abstraction(_, a, _), Abstraction(_, b, _)) => variableEquals(a, b)
     // todo: this seems like a hack, use variable to resolve debruinj index of abstraction
     | (_, Abstraction(_, symbol, _)) => equals(astA, makeVariable(symbol))
     | (Abstraction(_, symbol, _), _) => equals(makeVariable(symbol), astB)
@@ -40,6 +45,13 @@ let equalsWith = (symbolEquals) => {
     equals
 }
 
+
+/**
+    byDebruinj: compare to propositions, compare two propositions @stmtA and @stmtB leveraging the debruinj indexing
+        (the order in whcih they are introduced intot he proposition) of variable to assert whether two variables 
+        are equal. @aCtxSrc and @bCtxSrc are hashtables that from variable name to the debruinj index are built internally 
+        if not apssed in.  
+ */
 let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
 
     let ctxA = switch aCtxSrc {
@@ -61,12 +73,21 @@ let byDebruinj = (~aCtxSrc=?, ~bCtxSrc=?, stmtA, stmtB) => {
     equalsWithVariableIndexEquals(stmtA, stmtB)
 }
 
+/**
+    byName: compare to propositions, compare two propositions @stmtA and @stmtB leveraging the variable names to assert 
+        whether two variables are equal.
+ */
 let byName = (stmtA, stmtB) => {
     let nameEquals = (a, b) => a === b
     let equalsWithNameEquals = equalsWith(nameEquals)
     equalsWithNameEquals(stmtA, stmtB)
 }
 
+
+/**
+    byAbstractionResolution: compare to propositions, compare two propositions @stmtA and @stmtB this with @byName equality 
+        but investigating the details of an abstraction
+ */
 let rec byAbstractionResolution = (astA, astB) =>
     switch (astA, astB) {
     // Binary Operation Equals with intentional fall through
@@ -81,7 +102,7 @@ let rec byAbstractionResolution = (astA, astB) =>
     | (_, _) => byName(astA, astB)
     }
 
-module PropositionCompare= Belt.Id.MakeComparableU({
+module PropositionCompare = Belt.Id.MakeComparableU({
   type t = proposition
   let cmp = (a, b) => switch byName(a, b) {
   | true => 0
