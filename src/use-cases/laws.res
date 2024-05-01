@@ -9,9 +9,17 @@ exception ExpectingEquivalence(string)
 type law = (string, Ast.proposition, bool)
 
 /**
-    create a law through conver a propositional statement to an AST and 
-        ensuring it is an Equivallence Binary Operation 
+    makeLaw: make a `law` by converting a string that parsed into an `equivalence` `ast`
+        @bidirectional indicates that this law can be matched on eithr LHS or RHS of the
+        equivalence. Some laws do not make sense to be bidirectional as only one direction
+        can possibly simplify the problem: `T and T = T` is an example.  If bidirection 
+        was applied the possible next moves in reduction increase exponentially, e.g.,
 
+          `T` can be replaced by `T and T` then
+          `T and T` can be replaced by `T and T and T and T` then... 
+        
+        essentially any law that resolves to a single Boolean or single Variable should 
+        _not_ be bidirectional 
 */
 let makeLaw = (~bidirectional=true, name, propositionString) => {
   let ast = Parser.parse(propositionString)
