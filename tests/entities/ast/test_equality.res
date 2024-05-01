@@ -15,6 +15,7 @@ test("/entities/ast/equality.res/binOpEquals", () => {
         })
     }
 
+    // todo: write this in a way to throw a warning if a new binary operator is added
     binOpEqualsTest(Ast.Conjunction, [Ast.Disjunction, Ast.Conditional, Ast.BiConditional, Ast.Equivalence])
     binOpEqualsTest(Ast.Disjunction, [Ast.Conjunction, Ast.Conditional, Ast.BiConditional, Ast.Equivalence])
     binOpEqualsTest(Ast.Conditional, [Ast.Conjunction, Ast.Disjunction, Ast.BiConditional, Ast.Equivalence])
@@ -26,6 +27,7 @@ test("/entities/ast/equality.res/unOpEquals", () => {
     let a = Ast.Negation
     let aName = StringRepresentation.getUnOpName(a)
 
+    // todo: write this in a way to throw a warning if a new unary operator is added
     Assert.Boolean.isTrue("unOpEquals(" ++ aName ++ ", " ++ aName ++ ") should be true",  
             Equality.unOpEquals(a, a))
 })
@@ -94,5 +96,28 @@ test("/entities/ast/equality.res/byDeBruinj", () => {
 })
 
 test("/entities/ast/equality.res/byAbstractionResolution", () => {
-    ()
+    let a = Ast.Variable("" ,"a")
+    let b = Ast.Variable("" ,"b")
+    let c = Ast.Variable("" ,"c")
+    let d = Ast.Variable("" ,"d")
+    let aAndB = Ast.BinaryOperation("", Ast.Conjunction, a, b)
+    let cAndD = Ast.BinaryOperation("", Ast.Conjunction, c, d)
+    let aOrB = Ast.BinaryOperation("", Ast.Disjunction, a, b)
+
+    let abstractAandBasE = Ast.Abstraction("", "e", aAndB)
+    let abstractAandBasF = Ast.Abstraction("", "f", aAndB)
+    let abstractCandDasE = Ast.Abstraction("", "e", cAndD)
+
+    let test = (a, b, compare, label) => {
+        let aName = StringRepresentation.printImplicit(a)
+        let bName = StringRepresentation.printImplicit(b)
+        compare("byDeBruinj(" ++ aName ++ ", " ++ bName ++ ") " ++ label,  
+            Equality.byAbstractionResolution(a, b))
+    }
+
+    test(aAndB, aAndB, Assert.Boolean.isTrue, "should be true")
+    test(aAndB, aOrB, Assert.Boolean.isFalse, "should be false")  
+    test(abstractAandBasE, abstractAandBasE, Assert.Boolean.isTrue, "should be true")
+    test(abstractAandBasE, abstractAandBasF, Assert.Boolean.isTrue, "should be true (ignore the `e` and `f`)")
+    test(abstractAandBasE, abstractCandDasE, Assert.Boolean.isFalse, "should be false")
 })

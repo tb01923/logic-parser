@@ -114,3 +114,16 @@ module Lexer = {
     assertion(~message="Tokens Not Equal <" ++ toString(a) ++"," ++ toString(b) ++ ">", 
     ~operator="Lexer.isEqualtokenEquals", (a, b) => !tokenEquals(a, b), a, b)
 }
+
+module VectorRepresentation = {
+    let isNotEqual = (a, b) => !VectorRepresentation.isVectorsEqual(a, b)
+
+    let isVectorEqual = (a, b) =>
+        assertion(~message="Vectors Equal <>", 
+        ~operator="VectorRepresentation.isVectorEqual", VectorRepresentation.isVectorsEqual, a, b)
+
+    let isVectorNotEqual = (a, b) =>
+        assertion(~message="Vectors Equal <>", 
+        ~operator="VectorRepresentation.isVectorEqual", isNotEqual, a, b)
+  
+}

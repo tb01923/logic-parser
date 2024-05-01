@@ -1,17 +1,10 @@
 open Test
 
 test("/entities/ast/debruinj.res/getDebruinjIndices", () => {
-    let t = Ast.Value("", true)
     let a = Ast.Variable("" ,"a")
     let b = Ast.Variable("" ,"b")
-    let notT = Ast.UnaryOperation("", Ast.Negation, Ast.Value("", true))
     let aAndB = Ast.BinaryOperation("", Ast.Conjunction, a, b)
     let bAndA = Ast.BinaryOperation("", Ast.Conjunction, b, a)
-    let aOrB = Ast.BinaryOperation("", Ast.Disjunction, a, b)
-    let aImplB = Ast.BinaryOperation("", Ast.Conditional, a, b)
-    let aBiImplB = Ast.BinaryOperation("", Ast.BiConditional, a, b)
-    let aEquivA = Ast.BinaryOperation("", Ast.Equivalence, a, a)
-    let abstractAandB = Ast.Abstraction("", "c", aAndB)
 
     
     let hm1 = Belt.HashMap.String.make(~hintSize=2)

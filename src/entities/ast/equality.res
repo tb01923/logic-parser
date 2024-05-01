@@ -90,6 +90,7 @@ let byName = (stmtA, stmtB) => {
  */
 let rec byAbstractionResolution = (astA, astB) =>
     switch (astA, astB) {
+    | (Abstraction(_, _, opA), Abstraction(_, _, opB)) => byAbstractionResolution(opA, opB)
     // Binary Operation Equals with intentional fall through
     | (BinaryOperation(_, opA, lhsA, rhsA), Abstraction(_, _, BinaryOperation(_, opB, lhsB, rhsB)))
     | (Abstraction(_, _, BinaryOperation(_, opA, lhsA, rhsA)), BinaryOperation(_, opB, lhsB, rhsB)) =>
