@@ -1,7 +1,5 @@
 open Ast
-open Clone
 open Debruinj
-open Heuristic
 
 let rec getOperations = (node, candidates) =>
   switch node {
@@ -22,10 +20,10 @@ let rec getOperations = (node, candidates) =>
 let abstractOperation = (knownSymbols, operation) => {
     // use the debruinj logic to get a symobl for this abstraction,
     //  and register it in the known indexes
-    let nextSymbol = getNextSymbol(knownSymbols)
-    addSymbolToIndices(knownSymbols, nextSymbol) -> ignore
+    let nextSymbol = Debruinj.getNextSymbol(knownSymbols)
+    Debruinj.addSymbolToIndices(knownSymbols, nextSymbol) -> ignore
 
-    makeAbstraction(nextSymbol, operation)
+    Ast.makeAbstraction(nextSymbol, operation)
 }
 
 let rec performAbstraction = (statement, abstraction) => {
@@ -47,7 +45,7 @@ let applyAbstraction = (agg, abstraction) => {
     agg
     // build on the most recently applied abstraction
     -> Belt.Array.getExn(Belt.Array.length(agg)-1)
-    -> clone
+    -> Clone.clone
     // take the next abstraction (passed in function) and apply to the version
     //    of the statement, with all previous abstractions already applied
     -> performAbstraction(abstraction)
@@ -65,7 +63,7 @@ let getAbstractions = (statement) => {
   statement
   -> getOperations([])
   // score each operation for complexity, sort for simplicity first, then drop the scores
-  -> Belt.Array.map(node => (variablesRaisedToOperations(node), node))
+  -> Belt.Array.map(node => (Heuristic.variablesRaisedToOperations(node), node))
   -> Belt.SortArray.stableSortBy(sortByComplexity)
   -> Belt.Array.map(second)
   // remove duplicates bny placing into and removing from a set

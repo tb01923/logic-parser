@@ -24,11 +24,7 @@ type law = (string, Ast.proposition, bool)
 let makeLaw = (~bidirectional=true, name, propositionString) => {
   let ast = Parser.parse(propositionString)
   switch ast {
-  | BinaryOperation(_, op, _, _) =>
-    switch op {
-    | Equivalence => (name, ast, bidirectional)
-    | _ => raise(ExpectingEquivalence(propositionString))
-    }
+  | BinaryOperation(_, Equivalence, _, _) => (name, ast, bidirectional)
   | _ => raise(ExpectingEquivalence(propositionString))
   }
 }
@@ -68,6 +64,7 @@ let laws = [
     makeLaw("Absorbtion<and>", "p and (p or q) = p", ~bidirectional=false),
     makeLaw("Complement<or>", "p or not(p) = T", ~bidirectional=false),
     makeLaw("Complement<and>", "p and not(p) = F", ~bidirectional=false),
+
     // this group can be applied in both directions
     makeLaw("Commutative<and>", "p and q = q and p"),
     makeLaw("Commutative<or>", "p or q = q or p"),
@@ -77,6 +74,7 @@ let laws = [
     makeLaw("Associative<or>", "(p or q) or r = p or (q or r)"),
     makeLaw("Distributive<or(and)>", "p or (q and r) = (p or q) and (p or r)"),
     makeLaw("Distributive<and(or)>", "p and (q or r) = (p and q) or (p and r)"),
+
     // new
     makeLaw("biconditional equivalence", "(p and q) or (not(p) and not(q)) = p <=> q"),
     makeLaw("implication equivalence", "p or not(q) = p -> q")

@@ -30,6 +30,12 @@ let rec getParensNotOrAtom = tokens => switch peek( tokens ) {
         eat(Lexer.RParen, tokens)
         expression
     }
+    | Some(Lexer.LBracket) => {
+        eat(Lexer.LBracket, tokens)
+        let abstraction = getAbstraction(tokens)
+        eat(Lexer.RBracket, tokens)
+        abstraction
+    }
     | Some(Lexer.Variable(name)) => {
         eat(Lexer.Variable(name), tokens)
         Ast.makeVariable(name)
@@ -68,7 +74,22 @@ and getBinaryOperation = (tokens, operations) => {
     | _ => higherPrecedentExpression
     }
 }
-and getExpression = tokens => getBinaryOperation(tokens, Belt.Array.copy(operatorPrecendence))
+and getAbstraction = tokens => {
+    switch peek(tokens) {
+    | Some(Lexer.Variable(name)) => {
+        eat(Lexer.Variable(name), tokens)
+        eat(Lexer.Slash, tokens)
+        let expression = getExpression(tokens)
+        Ast.makeAbstraction(name, expression)
+    }
+    | Some(token) => raise(UnexpectedToken(token))
+    | None => raise(NoTokens)
+    }
+}
+and getExpression = tokens => {
+    getBinaryOperation(tokens, Belt.Array.copy(operatorPrecendence))
+}
+
 
 let parse = statement => {
     let tokens = Lexer.getTokens(statement)

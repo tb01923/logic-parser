@@ -7,6 +7,9 @@ type position = {
 type token =
   | LParen
   | RParen
+  | LBracket
+  | RBracket
+  | Slash
   | Not
   | And
   | Or
@@ -20,6 +23,9 @@ type token =
 let toString = (token) => switch (token) {
   | LParen => "LParen"
   | RParen => "RParen"
+  | LBracket => "LBracket"
+  | RBracket => "RBracket"
+  | Slash => "Slash"
   | Not => "Not"
   | And => "And"
   | Or => "Or"
@@ -68,17 +74,25 @@ let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (_, LParen) => false
     | (RParen, RParen) => true
     | (RParen, _) => false
+    | (_, RParen) => false
     | (Equal, Equal) => true
     | (Equal, _) => false
-    // this is covered by all other patterns
-    //| (RParen, _) => false
-    //| (_, RParen) => false
+    | (_, Equal) => false
+    | (LBracket, LBracket) => true
+    | (LBracket, _) => false
+    | (_, LBracket) => false
+    | (RBracket, RBracket) => true
+    | (RBracket, _) => false
+    | (_, RBracket) => false
+    | (Slash, Slash) => true
+    // | (Slash, _) => false
+    // | (_, Slash) => false
 }
 
 
 exception UnknownWord(string)
 
-let splitIntoWords = Js.String.splitByRe(%re("/([\s\(\)])/g"))
+let splitIntoWords = Js.String.splitByRe(%re("/([\s\(\)\[\]\/])/g"))
 let isSpace = word =>  switch Js.Re.exec_(%re("/\s+/"),word) {
     | Some(_) => true
     | None => false
@@ -88,6 +102,9 @@ let addWordToTokens = (tokens, word) => {
     let token = switch word {
         | "(" => LParen
         | ")" => RParen
+        | "[" => LBracket
+        | "]" => RBracket
+        | "/" => Slash
         | "~" => Not
         | "¬" => Not
         | "!" => Not

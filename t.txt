@@ -1,3 +1,17 @@
+a and b
+  1[a and b]
+a and b and c
+  1[a and b and  c]
+  2[a and b]
+  3[b and c]
+a and b and c and d
+   1[a and b and c and d]
+   2[a and b]
+   3[b and c]
+   4[c and d]
+   5[a and b and c]
+   6[b and c and d]
+
 ((((¬a ∨ ¬b) ∧ ¬a) ∨ (¬a ∨ ¬b)) ∧ (((¬a ∨ ¬b) ∧ ¬a) ∨ ¬b))
 ((((¬a ∨ ¬b) ∧ ¬a) ∨ ¬(a ∧ b)) ∧ (((¬a ∨ ¬b) ∧ ¬a) ∨ ¬b))
 (((¬(a ∧ b) ∧ ¬a) ∨ (¬a ∨ ¬b)) ∧ ((¬(a ∧ b) ∧ ¬a) ∨ ¬b))

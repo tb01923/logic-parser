@@ -72,15 +72,27 @@ let abstract = ast =>
 //    ->Belt.Array.map(Js.Console.log)
     ->ignore
 
+
+let printAbstractions = () => {
+    // "a and b and c or not(a and b and c)"
+    "a and b and c and d"
+    ->Parser.parse
+    ->Abstraction.getAbstractions
+    ->Belt.Array.map(StringRepresentation.printImplicit)
+    ->Belt.Array.map(Js.Console.log)
+    ->ignore
+}
+
 let solve = () => 
     // "a and b and c"
     // "not(a) and a"
     //"not(q) or p"
     //"(not(a and b) and not(a and b) or (a and b)) or F"
     //"(not(a and b) or not(a and b) or (a and b))"
-    "a and b and c or not(a and b and c)"
+    // "a and b and c or not(a and b and c)"
     //"a and a and a and a and a"
     //"p or q and p"
+    "(a ∧ [f/(b ∧ (c ∧ d))])"
     ->Parser.parse
     ->solve
     ->ignore
@@ -104,4 +116,5 @@ let printLaws = () => {
         ->ignore
 }
 
+// printAbstractions()
 solve()
