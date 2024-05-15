@@ -17,7 +17,7 @@ test("/entities/ast/clone.res/clone", () => {
 
     // test the same AST / Proposition cloned into a new alphabet, debruinj should be equal but variables different
     let clonedNewAlpha = Clone.clone(ast, ~targetAlphabet=hm) 
-    Assert.Ast.isNotEqualByName("clone(" ++ printImplicit(ast) ++") != " ++ printImplicit(ast), 
+    Assert.Ast.isNotEqualByName("clone(" ++ printImplicit(clonedNewAlpha) ++") != " ++ printImplicit(ast), 
         ast, clonedNewAlpha)
     Assert.Ast.isEqualByDeBruinj("clone(" ++ printImplicitDeBruinj(ast) ++") == " ++ printImplicitDeBruinj(ast), 
         ast, clonedNewAlpha)

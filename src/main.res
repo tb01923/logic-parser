@@ -116,5 +116,5 @@ let printLaws = () => {
         ->ignore
 }
 
-// printAbstractions()
-solve()
+printAbstractions()
+// solve()

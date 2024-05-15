@@ -85,6 +85,7 @@ let tokenEquals = (tokenA, tokenB) => switch (tokenA, tokenB) {
     | (RBracket, _) => false
     | (_, RBracket) => false
     | (Slash, Slash) => true
+    // covered by other cases, unnecssary per compiler
     // | (Slash, _) => false
     // | (_, Slash) => false
 }
