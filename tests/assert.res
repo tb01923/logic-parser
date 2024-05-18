@@ -124,6 +124,5 @@ module VectorRepresentation = {
 
     let isVectorNotEqual = (a, b) =>
         assertion(~message="Vectors Equal <>", 
-        ~operator="VectorRepresentation.isVectorEqual", isNotEqual, a, b)
-  
+        ~operator="VectorRepresentation.isVectorEqual", isNotEqual, a, b) 
 }
