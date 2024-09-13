@@ -1,9 +1,8 @@
 open Test
 
-test("/use-cases/lawApplication.res/identifyLaws", () => {
+test("/use-cases/lawApplication.res/identifyLaws: a and b or c or d", () => {
     let ast  = Parser.parse("a and b or c or d")
-    // Js.Console.log()
-    
+
     let actual = LawApplication.identifyLaws(ast)
 
     let expected = [
@@ -22,5 +21,29 @@ test("/use-cases/lawApplication.res/identifyLaws", () => {
         "actual matching laws for " ++ 
             StringRepresentation.printImplicit(ast) ++ 
             " should equal [Commutative<and>, Commutative<or>]", 
+        actual, expected)
+})
+
+test("/use-cases/lawApplication.res/identifyLaws: a and b or p and q", () => {
+    let ast  = Parser.parse("a and b or p and q")
+        
+    let actual = LawApplication.identifyLaws(ast)
+
+    let expected = [
+        LawApplication.makeTransformation(
+            Belt.Option.getExn(Laws.getLawByName("Commutative<and>")), 
+            LawApplication.LHS, 
+            Parser.parse("a and b")),
+
+        LawApplication.makeTransformation(
+            Belt.Option.getExn(Laws.getLawByName("Commutative<and>")), 
+            LawApplication.LHS, 
+            Parser.parse("p and q"))
+    ]
+
+    Assert.LawApplication.isTransformationsEqual(
+        "actual matching laws for " ++ 
+            StringRepresentation.printImplicit(ast) ++ 
+            " should equal [Commutative<and>, Commutative<and>]", 
         actual, expected)
 })
