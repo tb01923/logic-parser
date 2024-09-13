@@ -6,7 +6,7 @@ type matchedSide = LHS | RHS;
 type transformation = {
     matchedLaw: law,
     matchedSide: matchedSide,
-    statementMatched: Ast.proposition
+    matchedStatement: Ast.proposition
 }
 
 // todo: these belong in law
@@ -20,7 +20,7 @@ let getLawName = (thisLaw: law) => {
 }
 
 let makeTransformation = (law, side, statement) => {
-    {matchedLaw: law, matchedSide: side, statementMatched: statement}
+    {matchedLaw: law, matchedSide: side, matchedStatement: statement}
 }
 
 let equals = byDebruinj

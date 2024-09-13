@@ -37,12 +37,12 @@ let applyLawsToAbstraction = (abstraction, stepsFromOrigin:solutionSteps) => {
     ->LawApplication.identifyLaws
     ->Belt.Array.map(applicableLaw => {
 
-        let {matchedLaw, statementMatched, matchedSide}  = applicableLaw
+        let {matchedLaw, matchedStatement, matchedSide}  = applicableLaw
 
         // apply law tp current abstraction, providing a form for the next epoch
         let neighbor = replace(
             abstraction,
-            statementMatched,
+            matchedStatement,
             getLawAst(matchedLaw),
             matchedSide)
 

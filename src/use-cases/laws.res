@@ -79,3 +79,6 @@ let laws = [
     makeLaw("biconditional equivalence", "(p and q) or (not(p) and not(q)) = p <=> q"),
     makeLaw("implication equivalence", "p or not(q) = p -> q")
 ]
+
+let hasName = name1 => ((name2, _, _)) => name1 == name2
+let getLawByName = name => Js.Array2.find(laws, hasName(name))

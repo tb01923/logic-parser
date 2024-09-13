@@ -11,10 +11,8 @@ module Basics = {
     let isStringEqual = (message, a, b) =>
         assertion(~message=message, ~operator="Basics.isStringEqual", (a,b) => Js.String.localeCompare(a, b) == 0.0, a, b)
 
-    
     let isIntEqual = (message, a, b) =>
         assertion(~message=message, ~operator="Basics.isINtEqual", (a,b) => a == b, a, b)
-
 }
 
 
@@ -41,10 +39,11 @@ module HashMapIntString = {
     assertion(~message=message, ~operator="Assert.HashMapIntString.hasmapEqualBySet", iEqualBySet, a, b)
 }
 
+// for testing variabxle names, debruinj, etc 
 module HashMapStringInt = {
   module PairComparator = Belt.Id.MakeComparableU({
         type t = (string, int)
-         let cmp = ((a0, a1), (b0, b1)) =>
+        let cmp = ((a0, a1), (b0, b1)) =>
             switch Pervasives.compare(a0, b0) {
             | 0 => Pervasives.compare(a1, b1)
             | c => c
@@ -125,4 +124,35 @@ module VectorRepresentation = {
     let isVectorNotEqual = (a, b) =>
         assertion(~message="Vectors Equal <>", 
         ~operator="VectorRepresentation.isVectorEqual", isNotEqual, a, b) 
+}
+
+module LawApplication = {
+    open Laws
+    open LawApplication
+    let isTransformationsEqualByDestructure = (a: array<transformation>, b: array<transformation>) => {
+        let isLawEqual = (a: law, b: law) => {
+            let (aName, aProp, aReverse) = a
+            let (bName, bProp, bReverse) = b
+
+            (aName == bName && Equality.byName(aProp, bProp) && aReverse == bReverse )
+        }
+        
+        let isTransformationEqual = (a: transformation, b: transformation) => {
+            let {matchedLaw: aLaw, matchedSide: aSide, matchedStatement: aProp} = a
+            let {matchedLaw: bLaw, matchedSide: bSide, matchedStatement: bProp} = b
+
+            (isLawEqual(aLaw, bLaw) && aSide == bSide && Equality.byName(aProp, bProp))
+        }
+
+        let all_pairs_equal = (agg, (a,b)) => agg && isTransformationEqual(a,b) 
+        Belt.Array.reduce(Belt.Array.zip(a, b), true, all_pairs_equal)
+    }
+
+
+    let isTransformationsEqual = (message, a, b) =>
+        assertion(
+            ~message=message, 
+            ~operator="Assert.LawApplication.isTransformationsEqualByDestructure", 
+            isTransformationsEqualByDestructure, a, b)
+
 }

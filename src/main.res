@@ -56,10 +56,10 @@ let abstract = ast =>
         })
         ->Belt.Array.map((trans: LawApplication.transformation ) => {
 
-            let {matchedLaw, statementMatched, matchedSide} = trans
+            let {matchedLaw, matchedStatement, matchedSide} = trans
             let nextStatement = Replacement.replace(
                 ast,
-                statementMatched,
+                matchedStatement,
                 LawApplication.getLawAst(matchedLaw),
                 matchedSide)
 
